@@ -1,12 +1,12 @@
 """
-Example usage of the heurilab package with all 20 built-in algorithms.
+Example usage of the heurilab package with all 80 built-in algorithms.
 
 The first algorithm in the list is treated as the "proposed" algorithm.
 Swap it with your own custom class if needed.
 """
 
 import numpy as np
-from heurilab import run_experiment, BenchmarkSuite
+from heurilab import run_experiment, get_classical_suite, get_unimodal_suite, get_multimodal_suite
 from heurilab.algorithms import (
     # Swarm Intelligence
     PSO, GWO, WOA, MFO, SSA, HHO, MPA,
@@ -21,30 +21,16 @@ from heurilab.algorithms import (
 )
 
 
-# ── Benchmark Functions ──────────────────────────────────────────────
+# ── Built-in Benchmark Suites ───────────────────────────────────────
+# Use all 23 classical functions (F1–F23):
+#   classical = get_classical_suite()
+#
+# Or split by type:
+#   unimodal   = get_unimodal_suite()     # F1–F7
+#   multimodal = get_multimodal_suite()    # F8–F13
+#   fixeddim   = get_fixeddim_suite()      # F14–F23
 
-def sphere(x):
-    return np.sum(x ** 2)
-
-def rastrigin(x):
-    return 10 * len(x) + np.sum(x**2 - 10 * np.cos(2 * np.pi * x))
-
-def ackley(x):
-    n = len(x)
-    return (-20 * np.exp(-0.2 * np.sqrt(np.sum(x**2) / n))
-            - np.exp(np.sum(np.cos(2 * np.pi * x)) / n) + 20 + np.e)
-
-def rosenbrock(x):
-    return np.sum(100 * (x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2)
-
-
-# ── Define Suites ────────────────────────────────────────────────────
-
-classical = BenchmarkSuite("Classical")
-classical.add("Sphere", sphere, lb=-100, ub=100, dim=30)
-classical.add("Rastrigin", rastrigin, lb=-5.12, ub=5.12, dim=30)
-classical.add("Ackley", ackley, lb=-32, ub=32, dim=30)
-classical.add("Rosenbrock", rosenbrock, lb=-30, ub=30, dim=30)
+classical = get_classical_suite()
 
 
 # ── Run ──────────────────────────────────────────────────────────────
