@@ -1,0 +1,7 @@
+numpy
+scipy
+matplotlib
+openpyxl
+
+[dev]
+pytest
