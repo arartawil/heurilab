@@ -12,6 +12,10 @@ TLGO  — Teaching-Learning-based Genetic Optimization
 CoDE  — Composite Differential Evolution
 SaDE  — Self-adaptive Differential Evolution
 OXDE  — Opposition-based Learning DE
+AGDE  — Adaptive Guided Differential Evolution
+LSHADE — L-SHADE (Linear Population Size Reduction SHADE)
+EBOwithCMAR — Enhanced BO with CMA Restart
+IMODE — Improved Multi-Operator Differential Evolution
 """
 
 from heurilab.algorithms.evolutionary.ga import GA
@@ -25,6 +29,11 @@ from heurilab.algorithms.evolutionary.tlgo import TLGO
 from heurilab.algorithms.evolutionary.code import CoDE
 from heurilab.algorithms.evolutionary.sade import SaDE
 from heurilab.algorithms.evolutionary.oxde import OXDE
+from heurilab.algorithms.evolutionary.agde import AGDE
+from heurilab.algorithms.evolutionary.lshade import LSHADE
+from heurilab.algorithms.evolutionary.ebowithcmar import EBOwithCMAR
+from heurilab.algorithms.evolutionary.imode import IMODE
 
 __all__ = ["GA", "DE", "ES", "EP", "CMA", "BBO", "SHADE",
-           "TLGO", "CoDE", "SaDE", "OXDE"]
+           "TLGO", "CoDE", "SaDE", "OXDE",
+           "AGDE", "LSHADE", "EBOwithCMAR", "IMODE"]

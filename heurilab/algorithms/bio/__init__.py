@@ -12,6 +12,10 @@ WHO — Wildebeest Herd Optimization
 SBO — Satin Bowerbird Optimizer
 MBO — Monarch Butterfly Optimization
 EPO — Emperor Penguin Optimizer
+SMA — Slime Mould Algorithm
+HBA — Honey Badger Algorithm
+RSA — Reptile Search Algorithm
+GJO — Golden Jackal Optimization
 """
 
 from heurilab.algorithms.bio.abc import ABC
@@ -25,6 +29,11 @@ from heurilab.algorithms.bio.who import WHO
 from heurilab.algorithms.bio.sbo import SBO
 from heurilab.algorithms.bio.mbo import MBO
 from heurilab.algorithms.bio.epo import EPO
+from heurilab.algorithms.bio.sma import SMA
+from heurilab.algorithms.bio.hba import HBA
+from heurilab.algorithms.bio.rsa import RSA
+from heurilab.algorithms.bio.gjo import GJO
 
 __all__ = ["ABC", "FA", "SOS", "BFO", "CSA", "BOA", "TSA",
-           "WHO", "SBO", "MBO", "EPO"]
+           "WHO", "SBO", "MBO", "EPO",
+           "SMA", "HBA", "RSA", "GJO"]
