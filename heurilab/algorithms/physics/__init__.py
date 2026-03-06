@@ -5,11 +5,19 @@ GSA  — Gravitational Search Algorithm
 MVO  — Multi-Verse Optimizer
 SCA  — Sine Cosine Algorithm
 AOA  — Arithmetic Optimization Algorithm
+SA   — Simulated Annealing
+EO   — Equilibrium Optimizer
+WDO  — Wind Driven Optimization
+HGSO — Henry Gas Solubility Optimization
 """
 
 from heurilab.algorithms.physics.gsa import GSA
 from heurilab.algorithms.physics.mvo import MVO
 from heurilab.algorithms.physics.sca import SCA
 from heurilab.algorithms.physics.aoa import AOA
+from heurilab.algorithms.physics.sa import SA
+from heurilab.algorithms.physics.eo import EO
+from heurilab.algorithms.physics.wdo import WDO
+from heurilab.algorithms.physics.hgso import HGSO
 
-__all__ = ["GSA", "MVO", "SCA", "AOA"]
+__all__ = ["GSA", "MVO", "SCA", "AOA", "SA", "EO", "WDO", "HGSO"]
