@@ -13,6 +13,10 @@ CS   — Cuckoo Search
 FPA  — Flower Pollination Algorithm
 DA   — Dragonfly Algorithm
 GOA  — Grasshopper Optimization Algorithm
+ALO  — Ant Lion Optimizer
+SHO  — Spotted Hyena Optimizer
+DO   — Dolphin Optimizer
+EHO  — Elephant Herding Optimization
 """
 
 from heurilab.algorithms.swarm.pso import PSO
@@ -27,6 +31,11 @@ from heurilab.algorithms.swarm.cs import CS
 from heurilab.algorithms.swarm.fpa import FPA
 from heurilab.algorithms.swarm.da import DA
 from heurilab.algorithms.swarm.goa import GOA
+from heurilab.algorithms.swarm.alo import ALO
+from heurilab.algorithms.swarm.sho import SHO
+from heurilab.algorithms.swarm.do import DO
+from heurilab.algorithms.swarm.eho import EHO
 
 __all__ = ["PSO", "GWO", "WOA", "MFO", "SSA", "HHO", "MPA",
-           "BA", "CS", "FPA", "DA", "GOA"]
+           "BA", "CS", "FPA", "DA", "GOA",
+           "ALO", "SHO", "DO", "EHO"]
