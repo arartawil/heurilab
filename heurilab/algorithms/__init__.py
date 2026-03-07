@@ -1,5 +1,5 @@
 """
-Built-in metaheuristic algorithms — 80 algorithms in 5 categories.
+Built-in metaheuristic algorithms — 100 algorithms in 6 categories.
 
 Swarm Intelligence:   PSO, GWO, WOA, MFO, SSA, HHO, MPA, BA, CS, FPA, DA, GOA,
                       ALO, SHO, DO, EHO, AO, HGS, GTO, RUN
@@ -11,6 +11,8 @@ Human/Social:         TLBO, JA, HS, ICA, CA, BSO, SOS_H, QLA, INFO, HBO,
                       AOArch, CHIO, SSOA, POA
 Bio-inspired:         ABC, FA, SOS, BFO, CSA, BOA, TSA, WHO, SBO, MBO, EPO,
                       SMA, HBA, RSA, GJO
+Modern (2022–2025):   AVOA, DMO, MGO, DBO, COA, OOA, NOA, SAO, FLA, EVO,
+                      EDO, MOA, CPO, PO, FO, HO, KOA, SBOA, GMO, FFO
 """
 
 from heurilab.algorithms.base import _Base
@@ -31,6 +33,9 @@ from heurilab.algorithms.human import (TLBO, JA, HS, ICA, CA, BSO,
 from heurilab.algorithms.bio import (ABC, FA, SOS, BFO, CSA, BOA, TSA,
                                      WHO, SBO, MBO, EPO,
                                      SMA, HBA, RSA, GJO)
+from heurilab.algorithms.modern import (AVOA, DMO, MGO,
+                                        DBO, COA, OOA, NOA, SAO, FLA, EVO, EDO, MOA,
+                                        CPO, PO, FO, HO, KOA, SBOA, GMO, FFO)
 
 __all__ = [
     "_Base",
@@ -55,6 +60,10 @@ __all__ = [
     "ABC", "FA", "SOS", "BFO", "CSA", "BOA", "TSA",
     "WHO", "SBO", "MBO", "EPO",
     "SMA", "HBA", "RSA", "GJO",
+    # Modern (2022–2025)
+    "AVOA", "DMO", "MGO",
+    "DBO", "COA", "OOA", "NOA", "SAO", "FLA", "EVO", "EDO", "MOA",
+    "CPO", "PO", "FO", "HO", "KOA", "SBOA", "GMO", "FFO",
 ]
 
 # Convenience: all algorithms as (name, class) tuples grouped by category
@@ -94,7 +103,16 @@ BIO_ALGORITHMS = [
     ("SMA", SMA), ("HBA", HBA), ("RSA", RSA), ("GJO", GJO),
 ]
 
+MODERN_ALGORITHMS = [
+    ("AVOA", AVOA), ("DMO", DMO), ("MGO", MGO),
+    ("DBO", DBO), ("COA", COA), ("OOA", OOA), ("NOA", NOA),
+    ("SAO", SAO), ("FLA", FLA), ("EVO", EVO), ("EDO", EDO), ("MOA", MOA),
+    ("CPO", CPO), ("PO", PO), ("FO", FO), ("HO", HO),
+    ("KOA", KOA), ("SBOA", SBOA), ("GMO", GMO), ("FFO", FFO),
+]
+
 ALL_ALGORITHMS = (
     SWARM_ALGORITHMS + EVOLUTIONARY_ALGORITHMS +
-    PHYSICS_ALGORITHMS + HUMAN_ALGORITHMS + BIO_ALGORITHMS
+    PHYSICS_ALGORITHMS + HUMAN_ALGORITHMS + BIO_ALGORITHMS +
+    MODERN_ALGORITHMS
 )

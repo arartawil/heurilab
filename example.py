@@ -1,5 +1,5 @@
 """
-Example usage of the heurilab package with all 80 built-in algorithms.
+Example usage of the heurilab package with all 100 built-in algorithms.
 
 The first algorithm in the list is treated as the "proposed" algorithm.
 Swap it with your own custom class if needed.
@@ -18,6 +18,9 @@ from heurilab.algorithms import (
     TLBO, JA,
     # Bio-inspired
     ABC, FA, SOS,
+    # Modern (2022–2025)
+    AVOA, DMO, MGO, DBO, COA, OOA, NOA, SAO, FLA, EVO,
+    EDO, MOA, CPO, PO, FO, HO, KOA, SBOA, GMO, FFO,
 )
 
 
@@ -67,6 +70,27 @@ if __name__ == "__main__":
         ("ABC", ABC),
         ("FA", FA),
         ("SOS", SOS),
+        # ─── Modern (2022–2025) ───
+        ("AVOA", AVOA),
+        ("DMO", DMO),
+        ("MGO", MGO),
+        ("DBO", DBO),
+        ("COA", COA),
+        ("OOA", OOA),
+        ("NOA", NOA),
+        ("SAO", SAO),
+        ("FLA", FLA),
+        ("EVO", EVO),
+        ("EDO", EDO),
+        ("MOA", MOA),
+        ("CPO", CPO),
+        ("PO", PO),
+        ("FO", FO),
+        ("HO", HO),
+        ("KOA", KOA),
+        ("SBOA", SBOA),
+        ("GMO", GMO),
+        ("FFO", FFO),
     ]
 
     run_experiment(
