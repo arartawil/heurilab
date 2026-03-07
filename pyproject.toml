@@ -1,14 +1,39 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=64,<77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "heurilab"
-version = "1.0.0"
-description = "Metaheuristic optimization experiment infrastructure: runner, CSV, plots & statistical analysis"
+version = "2.0.0"
+description = "100 metaheuristic optimization algorithms with automated experiment runner, CSV, plots & statistical analysis"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
+authors = [
+    {name = "HeuriLab Contributors"},
+]
+keywords = [
+    "metaheuristic", "optimization", "swarm-intelligence",
+    "evolutionary-algorithm", "benchmark", "convergence",
+    "statistical-analysis", "CEC2017",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
 dependencies = [
     "numpy",
     "scipy",
@@ -17,7 +42,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "build", "twine"]
+
+[project.urls]
+Homepage = "https://github.com/arartawil/heurilab"
+Repository = "https://github.com/arartawil/heurilab"
+Issues = "https://github.com/arartawil/heurilab/issues"
 
 [tool.setuptools.packages.find]
 include = ["heurilab*"]

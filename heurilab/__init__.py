@@ -28,7 +28,7 @@ from heurilab.core.cec2017 import (
     get_cec2017_composition_suite,
 )
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __all__ = [
     "run_experiment", "BenchmarkConfig", "BenchmarkSuite",
     # Classical F1–F23
