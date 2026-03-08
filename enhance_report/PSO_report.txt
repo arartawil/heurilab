@@ -1,0 +1,126 @@
+
+==============================================================
+  ENHANCEMENT ADVISOR  —  PSO
+==============================================================
+
+  PERFORMANCE PROFILE
+  --------------------------------------------------------
+    Exploitation            71.7/100  [##############------]  Strong
+    Exploration            100.0/100  [####################]  Strong
+    Local Optima Escape     63.5/100  [############--------]  OK
+    Convergence Speed       17.5/100  [###-----------------]  Poor
+    Stability               11.3/100  [##------------------]  Poor
+    Stagnation Resist.       3.6/100  [--------------------]  Poor
+    Scalability (d=100)     68.7/100  [#############-------]  OK
+    Multimodal              75.0/100  [##############------]  Strong
+    Valley Navigation       38.4/100  [#######-------------]  Weak
+  --------------------------------------------------------
+    OVERALL                 52.8/100  [##########----------]  OK
+
+  DIAGNOSTIC TEST RESULTS
+  --------------------------------------------------------
+    Test                                   Mean          Std
+    Unimodal (F1 Sphere)             3.4164e+03   3.0309e+03
+    Valley (F5 Rosenbrock)           1.4497e+06   9.2775e+05
+    Multimodal (F9 Rastrigin)        2.7192e+02   2.0335e+01
+    Multimodal (F10 Ackley)          1.6680e+01   1.7327e+00
+    Multimodal (F11 Griewank)        7.6417e+01   6.1049e+01
+    High-Dim (F1 Sphere, d=100)      1.6706e+05   9.1279e+03
+
+  STRENGTHS
+  --------------------------------------------------------
+    + Exploitation: 72/100
+    + Exploration: 100/100
+    + Scalability (d=100): 69/100
+    + Multimodal: 75/100
+
+  WEAKNESSES
+  --------------------------------------------------------
+    - Early stagnation — stops improving too soon (4/100)
+    - Unstable — high variance across runs (11/100)
+    - Slow initial convergence (18/100)
+    - Difficulty navigating narrow valleys (Rosenbrock) (38/100)
+
+  PHASE ANALYSIS (Unimodal F1)
+  --------------------------------------------------------
+    Iter 1–50          46.9% improvement  >>> Exploring
+    Iter 50–100        53.1% improvement  >>> Active
+    Iter 100–150        0.0% improvement  > Stagnating
+    Iter 150–200        0.0% improvement  > Stagnated
+
+  RECOMMENDED ENHANCEMENTS (ranked by impact)
+  ========================================================
+
+  [1] Chaotic Inertia / Step-Size Decay
+      Impact: *****  |  Fixes: convergence_speed
+      Replace linear parameter decay with chaotic or cosine-based decay.
+This creates irregular exploration bursts that prevent premature convergence.
+
+      Code:
+        # Instead of: param = param_max - (param_max - param_min) * t / max_iter
+        # Use chaotic cosine decay:
+        param = 0.5 * (param_max + param_min) + \
+                0.5 * (param_max - param_min) * np.cos(np.pi * t / max_iter)
+      --------------------------------------------------
+
+  [2] Stagnation Escape (Population Restart)
+      Impact: ****  |  Fixes: stagnation
+      If no improvement for K iterations, reinitialize the worst portion
+of the population randomly. Keeps the best solutions while injecting
+fresh diversity.
+
+      Code:
+        # Track stagnation counter:
+        if best_fit_new >= best_fit_old:
+            stag_count += 1
+        else:
+            stag_count = 0
+        
+        # Restart worst 30% if stagnated for 15 iterations:
+        if stag_count >= 15:
+            n_restart = int(0.3 * pop_size)
+            worst_idx = np.argsort(fitness)[-n_restart:]
+            X[worst_idx] = np.random.uniform(self.lb, self.ub, (n_restart, dim))
+            for i in worst_idx:
+                fitness[i] = self._eval(X[i])
+            stag_count = 0
+      --------------------------------------------------
+
+  [3] Gaussian Local Search
+      Impact: ****  |  Fixes: convergence_speed
+      Apply small Gaussian perturbation around the best solution.
+Refines the best solution with fine-grained local search,
+improving exploitation in the final convergence phase.
+
+      Code:
+        # Apply local search around best every iteration:
+        sigma = (self.ub - self.lb) * 0.01 * (1 - t/max_iter)
+        x_local = best + np.random.randn(dim) * sigma
+        x_local = self._clip(x_local)
+        fit_local = self._eval(x_local)
+        if fit_local < best_fit:
+            best = x_local.copy()
+            best_fit = fit_local
+      --------------------------------------------------
+
+  [4] Elite Preservation with Perturbation
+      Impact: ***  |  Fixes: stability
+      Keep the top K solutions unchanged, but create perturbed copies.
+Ensures the best solutions survive while still generating diverse offspring.
+
+      Code:
+        # After position update, preserve top 3:
+        elite_n = 3
+        elite_idx = np.argsort(fitness)[:elite_n]
+        elite_X = X[elite_idx].copy()
+        elite_fit = fitness[elite_idx].copy()
+        
+        # ... (run algorithm update) ...
+        
+        # Restore elites:
+        worst_idx = np.argsort(fitness)[-elite_n:]
+        X[worst_idx] = elite_X
+        fitness[worst_idx] = elite_fit
+      --------------------------------------------------
+
+==============================================================
