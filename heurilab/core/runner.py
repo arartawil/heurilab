@@ -6,6 +6,7 @@ import os
 import time
 import numpy as np
 from typing import List, Tuple, Type, Dict, Optional
+from tqdm import tqdm
 
 from heurilab.core.benchmarks import BenchmarkConfig, BenchmarkSuite
 from heurilab.exporters.csv_export import (
@@ -70,7 +71,11 @@ def run_experiment(
     suites_map: Dict[str, List[str]] = {}
 
     total_combos = sum(len(s.benchmarks) for s in benchmark_suites) * len(algorithms)
-    combo_count = 0
+
+    # ── Main progress bar ────────────────────────────────────────────
+    pbar = tqdm(total=total_combos, desc="Experiment",
+                bar_format="{l_bar}{bar:30}{r_bar}",
+                colour="green", dynamic_ncols=True)
 
     for suite in benchmark_suites:
         category = suite.category
@@ -87,8 +92,7 @@ def run_experiment(
                 convergence_data[func_name] = {}
 
             for algo_name, algo_class in algorithms:
-                combo_count += 1
-                print(f"[{combo_count}/{total_combos}] {func_name} × {algo_name}")
+                pbar.set_postfix_str(f"{func_name} × {algo_name}", refresh=True)
 
                 run_fitnesses = []
                 run_convergences = []
@@ -112,6 +116,7 @@ def run_experiment(
                     run_fitnesses.append(best_fit)
                     run_convergences.append(conv)
 
+                    # CSV saved in real-time after every single run
                     append_raw_run(csv_paths["raw_runs"], func_name, algo_name,
                                    run, best_fit, elapsed, conv, max_iter)
 
@@ -137,8 +142,9 @@ def run_experiment(
                 )
                 convergence_data[func_name][algo_name] = list(mean_conv)
 
-                print(f"       Mean={np.mean(arr):.4e}  Std={np.std(arr):.4e}")
+                pbar.update(1)
 
+    pbar.close()
     print(f"\nCSV files written to: {os.path.join(output_dir, 'CSV Data')}")
 
     # ── Phase 2: Convergence & Box plots ─────────────────────────────

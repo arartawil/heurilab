@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heurilab"
-version = "2.0.0"
+version = "2.0.1"
 description = "100 metaheuristic optimization algorithms with automated experiment runner, CSV, plots & statistical analysis"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -39,6 +39,7 @@ dependencies = [
     "scipy",
     "matplotlib",
     "openpyxl",
+    "tqdm",
 ]
 
 [project.optional-dependencies]
