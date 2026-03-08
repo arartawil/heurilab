@@ -1,5 +1,9 @@
 # HeuriLab
 
+<p align="center">
+  <img src="logo.png" alt="HeuriLab Logo" width="400">
+</p>
+
 A Python package with **100 built-in metaheuristic optimization algorithms** and automated experiment infrastructure: runner, CSV outputs, convergence/box plots, and statistical Excel analysis.
 
 ## Installation
