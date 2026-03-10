@@ -785,6 +785,257 @@ def _plot_score_bar(algo_name: str, scores: dict, output_dir: str):
 
 
 # ═════════════════════════════════════════════════════════════════════
+#  Custom Benchmark Scoring & Reporting
+# ═════════════════════════════════════════════════════════════════════
+
+def _compute_custom_scores(all_results: dict, tests: dict) -> dict:
+    """Compute scores from custom benchmark results."""
+    scores = {}
+    n_tests = len(all_results)
+    keys = list(all_results.keys())
+
+    # --- Per-function scores based on closeness to optimum ---
+    func_scores = []
+    for key in keys:
+        res = all_results[key]
+        optimum = tests[key].get("optimum", 0.0)
+        mean_fit = np.mean(res["fitnesses"])
+        error = abs(mean_fit - optimum)
+        if error < 1e-10:
+            s = 100.0
+        else:
+            log_err = np.log10(error + 1e-30)
+            s = float(np.clip((6 - log_err) / 16 * 100, 0, 100))
+        func_scores.append(s)
+
+    # --- Exploitation: average quality on all functions ---
+    scores["exploitation"] = float(np.mean(func_scores))
+
+    # --- Exploration: average initial diversity across tests ---
+    divs = []
+    for key in keys:
+        for d_list in all_results[key]["diversities"]:
+            if len(d_list) >= 2:
+                divs.append(d_list[0])
+    init_div = np.mean(divs) if divs else 0
+    scores["exploration"] = float(np.clip(init_div / 30 * 100, 0, 100))
+
+    # --- Convergence speed: average across all tests ---
+    speeds = []
+    for key in keys:
+        for conv in all_results[key]["convergences"]:
+            speeds.append(_convergence_speed(conv))
+    scores["convergence_speed"] = float(np.clip(np.mean(speeds) * 100, 0, 100))
+
+    # --- Stability: average inverse CV across tests ---
+    stabilities = []
+    for key in keys:
+        fits = np.array(all_results[key]["fitnesses"])
+        if np.mean(np.abs(fits)) > 0:
+            cv = np.std(fits) / (np.mean(np.abs(fits)) + 1e-30)
+            stabilities.append(float(np.clip((1 - cv) * 100, 0, 100)))
+        else:
+            stabilities.append(100.0)
+    scores["stability"] = float(np.mean(stabilities))
+
+    # --- Stagnation resistance: average across tests ---
+    stags = []
+    for key in keys:
+        res = all_results[key]
+        max_iter_used = len(res["convergences"][0]) if res["convergences"] else 200
+        mean_stag = np.mean(res["stagnation_points"])
+        stags.append(mean_stag / max_iter_used)
+    scores["stagnation"] = float(np.clip(np.mean(stags) * 100, 0, 100))
+
+    # --- Local optima escape: score on multimodal/hybrid/composition if present ---
+    scores["local_optima_escape"] = float(np.median(func_scores))
+
+    # --- Scalability & multimodal: use same as exploitation for custom ---
+    scores["scalability"] = scores["exploitation"]
+    scores["multimodal"] = float(np.mean(func_scores[-max(1, n_tests // 3):]))
+    scores["valley_navigation"] = float(np.mean(func_scores[:max(1, n_tests // 3)]))
+
+    # --- Overall ---
+    weights = {
+        "exploitation": 0.20, "exploration": 0.10, "local_optima_escape": 0.20,
+        "convergence_speed": 0.10, "stability": 0.10, "stagnation": 0.10,
+        "scalability": 0.10, "multimodal": 0.05, "valley_navigation": 0.05,
+    }
+    scores["overall"] = float(sum(scores[k] * weights[k] for k in weights))
+
+    return scores
+
+
+def _format_custom_report(algo_name: str, scores: dict, weaknesses: list,
+                          suggestions: list, all_results: dict,
+                          tests: dict) -> str:
+    """Build the full text report for custom benchmarks."""
+    lines = []
+    lines.append("")
+    lines.append("=" * 62)
+    lines.append(f"  ENHANCEMENT ADVISOR  —  {algo_name}")
+    lines.append("=" * 62)
+
+    # ── Scores ──
+    lines.append("")
+    lines.append("  PERFORMANCE PROFILE")
+    lines.append("  " + "-" * 56)
+
+    score_labels = [
+        ("exploitation",        "Exploitation"),
+        ("exploration",         "Exploration"),
+        ("local_optima_escape", "Local Optima Escape"),
+        ("convergence_speed",   "Convergence Speed"),
+        ("stability",           "Stability"),
+        ("stagnation",          "Stagnation Resist."),
+        ("scalability",         "Scalability"),
+        ("multimodal",          "Multimodal"),
+        ("valley_navigation",   "Valley Navigation"),
+    ]
+
+    for key, label in score_labels:
+        s = scores.get(key, 0)
+        icon = _score_icon(s)
+        bar = _score_bar(s)
+        lines.append(f"    {label:<22s} {s:5.1f}/100  {bar}  {icon}")
+
+    s_overall = scores.get("overall", 0)
+    lines.append("  " + "-" * 56)
+    lines.append(f"    {'OVERALL':<22s} {s_overall:5.1f}/100  {_score_bar(s_overall)}  {_score_icon(s_overall)}")
+
+    # ── Test Results Summary ──
+    lines.append("")
+    lines.append("  BENCHMARK TEST RESULTS")
+    lines.append("  " + "-" * 56)
+    lines.append(f"    {'Function':<35s} {'Mean':>12s} {'Std':>12s}")
+    for key in all_results:
+        cfg = tests[key]
+        res = all_results[key]
+        mean_f = np.mean(res["fitnesses"])
+        std_f = np.std(res["fitnesses"])
+        name = cfg["name"]
+        if len(name) > 35:
+            name = name[:32] + "..."
+        lines.append(f"    {name:<35s} {mean_f:>12.4e} {std_f:>12.4e}")
+
+    # ── Strengths ──
+    lines.append("")
+    lines.append("  STRENGTHS")
+    lines.append("  " + "-" * 56)
+    strengths_found = False
+    for key, label in score_labels:
+        if scores.get(key, 0) >= 65:
+            strengths_found = True
+            lines.append(f"    + {label}: {scores[key]:.0f}/100")
+    if not strengths_found:
+        lines.append("    (no strong areas detected)")
+
+    # ── Weaknesses ──
+    lines.append("")
+    lines.append("  WEAKNESSES")
+    lines.append("  " + "-" * 56)
+    if weaknesses:
+        for w in weaknesses:
+            lines.append(f"    - {w['description']} ({w['score']:.0f}/100)")
+    else:
+        lines.append("    (no major weaknesses detected — algorithm is well-balanced!)")
+
+    # ── Enhancement Suggestions ──
+    lines.append("")
+    lines.append("  RECOMMENDED ENHANCEMENTS (ranked by impact)")
+    lines.append("  " + "=" * 56)
+    if suggestions:
+        for i, sug in enumerate(suggestions, 1):
+            stars = "*" * sug["impact"]
+            fixes_str = ", ".join(sug["fixes_found"])
+            lines.append("")
+            lines.append(f"  [{i}] {sug['name']}")
+            lines.append(f"      Impact: {stars}  |  Fixes: {fixes_str}")
+            lines.append(f"      {sug['description']}")
+            lines.append("")
+            lines.append("      Code:")
+            for code_line in sug["code"].split("\n"):
+                lines.append(f"        {code_line}")
+            lines.append("      " + "-" * 50)
+    else:
+        lines.append("    No enhancements needed — algorithm is performing well!")
+
+    lines.append("")
+    lines.append("=" * 62)
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def _plot_custom_convergence(algo_name: str, all_results: dict, tests: dict,
+                             output_dir: str):
+    """Convergence curves for custom benchmark tests."""
+    keys = list(all_results.keys())
+    n = len(keys)
+    cols = min(4, n)
+    rows = (n + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 3.5 * rows))
+    if n == 1:
+        axes = np.array([axes])
+    axes = np.atleast_2d(axes).flatten()
+
+    for idx, key in enumerate(keys):
+        ax = axes[idx]
+        convs = all_results[key]["convergences"]
+        for c in convs:
+            ax.plot(c, alpha=0.2, color="#4363d8", linewidth=0.8)
+        min_len = min(len(c) for c in convs)
+        avg = np.mean([c[:min_len] for c in convs], axis=0)
+        ax.plot(avg, color="#e6194b", linewidth=2, label="Mean")
+        short = tests[key]["name"].replace("CEC17_", "")
+        ax.set_title(short, fontsize=8, fontweight="bold")
+        ax.set_xlabel("Iter", fontsize=7)
+        ax.set_ylabel("Fitness", fontsize=7)
+        ax.tick_params(labelsize=6)
+        ax.set_yscale("log")
+        ax.grid(True, alpha=0.3)
+
+    for idx in range(n, len(axes)):
+        axes[idx].set_visible(False)
+
+    fig.suptitle(f"{algo_name} — CEC 2017 Convergence", fontsize=14, fontweight="bold")
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    path = os.path.join(output_dir, f"{algo_name}_convergence_cec2017.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+def _plot_custom_diversity(algo_name: str, all_results: dict, tests: dict,
+                           output_dir: str):
+    """Diversity curves for custom benchmark tests (first 4)."""
+    keys = list(all_results.keys())[:4]
+    fig, axes = plt.subplots(1, len(keys), figsize=(4 * len(keys), 4))
+    if len(keys) == 1:
+        axes = [axes]
+
+    for ax, key in zip(axes, keys):
+        divs = all_results[key]["diversities"]
+        for d in divs:
+            ax.plot(d, alpha=0.2, color="#3cb44b", linewidth=0.8)
+        if divs:
+            min_len = min(len(d) for d in divs)
+            avg = np.mean([d[:min_len] for d in divs], axis=0)
+            ax.plot(avg, color="#e6194b", linewidth=2, label="Mean")
+        short = tests[key]["name"].replace("CEC17_", "")
+        ax.set_title(f"{short} — Diversity", fontsize=9, fontweight="bold")
+        ax.set_xlabel("Generation", fontsize=8)
+        ax.set_ylabel("Diversity", fontsize=8)
+        ax.legend(fontsize=7)
+        ax.grid(True, alpha=0.3)
+
+    fig.suptitle(f"{algo_name} — Diversity Analysis", fontsize=14, fontweight="bold")
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
+    path = os.path.join(output_dir, f"{algo_name}_diversity_cec2017.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+# ═════════════════════════════════════════════════════════════════════
 #  Main Public API
 # ═════════════════════════════════════════════════════════════════════
 
@@ -794,6 +1045,7 @@ def enhance(
     pop_size: int = _POP_SIZE,
     max_iter: int = _MAX_ITER,
     n_runs: int = _N_DIAG_RUNS,
+    benchmarks: dict = None,
 ):
     """
     Run diagnostic benchmarks and provide enhancement suggestions.
@@ -810,6 +1062,10 @@ def enhance(
         Max iterations for diagnostic runs.
     n_runs : int
         Number of runs per diagnostic test.
+    benchmarks : dict, optional
+        Custom benchmark tests. Each key maps to a dict with keys:
+        'name', 'func', 'lb', 'ub', 'dim', 'optimum'.
+        If None, uses the built-in 6-function diagnostic suite.
 
     Returns
     -------
@@ -818,16 +1074,19 @@ def enhance(
     algo_name, algo_class = algorithm
     os.makedirs(output_dir, exist_ok=True)
 
+    tests = benchmarks if benchmarks is not None else _DIAG_TESTS
+    custom_mode = benchmarks is not None
+
     print(f"\n{'=' * 62}")
     print(f"  Running Enhancement Advisor for: {algo_name}")
     print(f"  Pop={pop_size}, MaxIter={max_iter}, Runs={n_runs}")
-    print(f"  Tests: {len(_DIAG_TESTS)} diagnostic benchmarks")
+    print(f"  Tests: {len(tests)} benchmarks" + (" (custom)" if custom_mode else ""))
     print(f"{'=' * 62}\n")
 
     # ── Run all diagnostic tests ──
     all_results = {}
-    for i, (key, cfg) in enumerate(_DIAG_TESTS.items(), 1):
-        print(f"  [{i}/{len(_DIAG_TESTS)}] {cfg['name']} ...", end=" ", flush=True)
+    for i, (key, cfg) in enumerate(tests.items(), 1):
+        print(f"  [{i}/{len(tests)}] {cfg['name']} ...", end=" ", flush=True)
         results = _run_diagnostic(algo_name, algo_class, key, cfg,
                                   n_runs, pop_size, max_iter)
         all_results[key] = results
@@ -835,7 +1094,10 @@ def enhance(
         print(f"mean={mean_f:.4e}")
 
     # ── Compute scores ──
-    scores = _compute_scores(all_results)
+    if custom_mode:
+        scores = _compute_custom_scores(all_results, tests)
+    else:
+        scores = _compute_scores(all_results)
 
     # ── Detect weaknesses ──
     weaknesses = _detect_weaknesses(scores)
@@ -844,7 +1106,11 @@ def enhance(
     suggestions = _suggest_enhancements(weaknesses)
 
     # ── Generate report ──
-    report_text = _format_report(algo_name, scores, weaknesses, suggestions, all_results)
+    if custom_mode:
+        report_text = _format_custom_report(algo_name, scores, weaknesses,
+                                            suggestions, all_results, tests)
+    else:
+        report_text = _format_report(algo_name, scores, weaknesses, suggestions, all_results)
     print(report_text)
 
     # ── Save report ──
@@ -855,8 +1121,10 @@ def enhance(
     # ── Generate plots ──
     print("  Generating plots...", flush=True)
     _plot_score_bar(algo_name, scores, output_dir)
-    _plot_convergence_diagnostic(algo_name, all_results, output_dir)
-    _plot_diversity(algo_name, all_results, output_dir)
+    _plot_custom_convergence(algo_name, all_results, tests, output_dir) if custom_mode \
+        else _plot_convergence_diagnostic(algo_name, all_results, output_dir)
+    _plot_custom_diversity(algo_name, all_results, tests, output_dir) if custom_mode \
+        else _plot_diversity(algo_name, all_results, output_dir)
     _plot_scores_radar(algo_name, scores, output_dir)
 
     print(f"\n  Report saved to: {report_path}")

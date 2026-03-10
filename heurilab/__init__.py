@@ -28,6 +28,7 @@ from heurilab.core.cec2017 import (
     get_cec2017_composition_suite,
 )
 from heurilab.analyzer import enhance
+from heurilab.analyzer import cec2017_benchmarks
 
 __version__ = "2.0.1"
 __all__ = [
