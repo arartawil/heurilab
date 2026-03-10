@@ -832,6 +832,184 @@ Each suggestion includes a description and ready-to-use Python code snippet.
 
 ---
 
+### How to Use the Enhancement Advisor — Step by Step
+
+#### Step 1: Run a Quick Diagnostic on Your Algorithm
+
+```python
+from heurilab.analyzer import enhance
+from heurilab.algorithms import PSO   # or your own algorithm
+
+result = enhance(
+    algorithm=("PSO", PSO),
+    output_dir="enhance_report_pso",
+    pop_size=50,
+    max_iter=200,
+    n_runs=10,
+)
+```
+
+This runs 6 built-in diagnostic tests (Sphere, Rosenbrock, Rastrigin, Ackley, Griewank, High-Dim Sphere) and generates a full report.
+
+#### Step 2: Read the Scores
+
+```python
+scores = result["scores"]
+print(f"Overall:            {scores['overall']:.1f}/100")
+print(f"Exploitation:       {scores['exploitation']:.1f}/100")
+print(f"Exploration:        {scores['exploration']:.1f}/100")
+print(f"Local Optima Escape:{scores['local_optima_escape']:.1f}/100")
+print(f"Convergence Speed:  {scores['convergence_speed']:.1f}/100")
+print(f"Stability:          {scores['stability']:.1f}/100")
+print(f"Stagnation:         {scores['stagnation']:.1f}/100")
+print(f"Scalability:        {scores['scalability']:.1f}/100")
+print(f"Multimodal:         {scores['multimodal']:.1f}/100")
+print(f"Valley Navigation:  {scores['valley_navigation']:.1f}/100")
+```
+
+#### Step 3: Check Detected Weaknesses
+
+```python
+if result["weaknesses"]:
+    print("⚠️  Weaknesses detected:")
+    for w in result["weaknesses"]:
+        print(f"  - {w}")
+else:
+    print("✅ No major weaknesses found!")
+```
+
+#### Step 4: Read Enhancement Suggestions
+
+```python
+for i, suggestion in enumerate(result["suggestions"], 1):
+    print(f"\n{'='*60}")
+    print(f"Suggestion #{i}: {suggestion['name']}")
+    print(f"Impact: {'★' * suggestion['impact']}")
+    print(f"Description: {suggestion['description']}")
+    print(f"Code:\n{suggestion['code']}")
+```
+
+#### Step 5: Check the Generated Files
+
+After running, your output directory will contain:
+
+```
+enhance_report_pso/
+├── PSO_report.txt          ← Full text report (human-readable)
+├── PSO_radar.png           ← Radar chart showing strengths/weaknesses
+├── PSO_scores.png          ← Bar chart of all metric scores
+├── PSO_convergence.png     ← Convergence curves across diagnostic tests
+└── PSO_diversity.png       ← Population diversity over iterations
+```
+
+The `_report.txt` file includes everything: scores, weaknesses, suggestions with code snippets — ready for your research notes.
+
+#### Step 6: Deep Analysis with CEC 2017
+
+For a more thorough analysis using all 29 CEC 2017 competition functions:
+
+```python
+from heurilab.analyzer import enhance, cec2017_benchmarks
+
+result = enhance(
+    algorithm=("PSO", PSO),
+    output_dir="enhance_report_pso_cec2017",
+    benchmarks=cec2017_benchmarks(dim=30),
+    pop_size=30,
+    max_iter=500,
+    n_runs=10,
+)
+```
+
+#### Step 7: Analyze Your Own Custom Algorithm
+
+```python
+from heurilab.analyzer import enhance
+
+# Your custom algorithm (must extend _Base)
+from my_algorithm import MyOptimizer
+
+result = enhance(
+    algorithm=("MyOptimizer", MyOptimizer),
+    output_dir="enhance_report_myopt",
+    pop_size=50,
+    max_iter=300,
+    n_runs=15,
+)
+
+# Then apply the suggested fixes and re-analyze:
+# result_v2 = enhance(("MyOptimizer_v2", MyOptimizerV2), output_dir="enhance_report_v2")
+# Compare scores to see improvement!
+```
+
+#### Step 8: Use Custom Benchmarks
+
+You can define your own diagnostic tests:
+
+```python
+import numpy as np
+
+benchmarks = {
+    "sphere_10d": {
+        "name": "Sphere (d=10)",
+        "func": lambda x: np.sum(x**2),
+        "lb": -100, "ub": 100, "dim": 10,
+        "optimum": 0.0,
+    },
+    "sphere_50d": {
+        "name": "Sphere (d=50)",
+        "func": lambda x: np.sum(x**2),
+        "lb": -100, "ub": 100, "dim": 50,
+        "optimum": 0.0,
+    },
+    "rastrigin_50d": {
+        "name": "Rastrigin (d=50)",
+        "func": lambda x: 10*len(x) + np.sum(x**2 - 10*np.cos(2*np.pi*x)),
+        "lb": -5.12, "ub": 5.12, "dim": 50,
+        "optimum": 0.0,
+    },
+}
+
+result = enhance(
+    algorithm=("PSO", PSO),
+    output_dir="enhance_custom",
+    benchmarks=benchmarks,
+    pop_size=40,
+    max_iter=200,
+    n_runs=10,
+)
+```
+
+#### Complete Enhancement Workflow Example
+
+```python
+from heurilab.analyzer import enhance, cec2017_benchmarks
+from heurilab.algorithms import GWO
+
+# ── Phase 1: Quick diagnostic ────────────────────────
+result = enhance(("GWO", GWO), output_dir="gwo_analysis/diagnostic")
+print(f"Overall Score: {result['scores']['overall']:.1f}/100")
+print(f"Weaknesses: {result['weaknesses']}")
+print(f"Top suggestion: {result['suggestions'][0]['name']}")
+
+# ── Phase 2: CEC 2017 deep analysis ──────────────────
+result_cec = enhance(
+    ("GWO", GWO),
+    output_dir="gwo_analysis/cec2017",
+    benchmarks=cec2017_benchmarks(dim=30),
+    pop_size=30,
+    max_iter=500,
+    n_runs=10,
+)
+
+# ── Phase 3: Apply fixes → re-analyze improved version ─
+# (After implementing suggested enhancements in GWO_v2)
+# result_v2 = enhance(("GWO_v2", GWO_v2), output_dir="gwo_analysis/v2")
+# Compare: result["scores"]["overall"] vs result_v2["scores"]["overall"]
+```
+
+---
+
 ## 📤 Exporters Module
 
 ### CSV Export
