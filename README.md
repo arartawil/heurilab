@@ -42,19 +42,26 @@
 
 ## 🎯 HeuriLab vs Others
 
-| Feature | HeuriLab | MEALPY | PySwarms | SciPy |
-|---------|----------|--------|----------|-------|
-| **Algorithms** | ✅ 98 | ~200 | PSO only | Few |
-| **Benchmarks** | ✅ 52 (Classical + CEC 2017) | Limited | None | None |
-| **Automated Runner** | ✅ One function call | ❌ Manual | ❌ Manual | ❌ Manual |
-| **CSV + Excel Export** | ✅ Real-time | ❌ | ❌ | ❌ |
-| **Statistical Tests** | ✅ Wilcoxon + Friedman + Nemenyi | ❌ | ❌ | ❌ |
-| **Convergence Plots** | ✅ Auto-generated | Manual | Manual | ❌ |
-| **Box Plots** | ✅ Auto-generated | ❌ | ❌ | ❌ |
-| **Enhancement Advisor** | ✅ Built-in | ❌ | ❌ | ❌ |
-| **Engineering Problems** | ✅ Built-in | ❌ | ❌ | ❌ |
-| **Progress Bar** | ✅ tqdm | ❌ | ❌ | ❌ |
-| **Simplicity** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+Determined by installing each package and reading its source, not from its documentation.
+
+| Feature | HeuriLab | MEALPY | pymoo | NiaPy | PySwarms |
+|---|---|---|---|---|---|
+| **Algorithms** | 98 | ~230 | 33 | 39–77 | 4 (PSO only) |
+| **Benchmark functions** | 248 | via `opfunu`, unwrapped | rich, multi-objective | ~40 | none |
+| **Engineering problems** | 12, optima verified | none | G-problems, unverified | none | none |
+| **One-call campaign** | yes | raw values only | none | partial | none |
+| **Significance tests** | Wilcoxon, Friedman, Nemenyi | none | none | none | none |
+| **Box plots** | yes | none | none | none | none |
+| **Reproducible campaign** | yes | no | n/a | no | no |
+| **Parallel** | across runs, identical to serial | inside the run | partial | partial | no |
+| **Evaluation-budget calibration** | measured per algorithm | manual FE limit | none | none | none |
+| **Behavioural diagnosis** | scores + ranked remedies | charts only | none | none | none |
+| **Structural novelty audit** | 19 criteria | none | none | none | none |
+
+> MEALPY offers a function-evaluation termination limit and plots diversity and
+> exploration/exploitation per run. What HeuriLab adds is measuring each algorithm's
+> per-iteration cost so the budget converts to iterations automatically, and turning
+> those measurements into a diagnosis.
 
 ---
 
@@ -78,6 +85,10 @@
   - [Bio-inspired (15)](#bio-inspired-15)
   - [Modern 2022–2025 (20)](#modern-20222025-20)
   - [Convenience Algorithm Lists](#convenience-algorithm-lists)
+- [Evaluation-Budget Fairness](#%EF%B8%8F-evaluation-budget-fairness)
+- [Reproducibility & Parallelism](#-reproducibility--parallelism)
+- [Behavioural Analysis](#-behavioural-analysis)
+- [Structural Novelty Auditing](#-structural-novelty-auditing)
 - [Benchmark Suites](#-benchmark-suites)
   - [Classical Functions (F1–F23)](#classical-benchmark-functions-f1f23)
   - [CEC 2017 Functions (29)](#cec-2017-benchmark-functions-29-functions)
@@ -575,6 +586,147 @@ run_experiment(
     ...
 )
 ```
+
+---
+
+## ⚖️ Evaluation-Budget Fairness
+
+Algorithms consume very different numbers of objective evaluations per iteration.
+Measured across this registry at a population of 30:
+
+| Algorithm | Evaluations / iteration | After 500 iterations |
+|---|---|---|
+| HS | 1.0 | 330 |
+| LSHADE | 17.1 | 5,169 |
+| PSO, GWO, WOA + 74 others | 30.0 | 9,030 |
+| TSA | 89.5 | 27,058 |
+| ES | 210.0 | 63,030 |
+| FA | 434.9 | **130,526** |
+
+A **396× spread** for the same nominal budget. Comparing at equal iterations
+distributes search budget rather than measuring search quality.
+
+### Enforce a budget
+
+```python
+from heurilab.algorithms import GWO
+
+algo = GWO(pop_size=30, dim=30, lb=-100, ub=100,
+           max_iter=500, obj_func=my_func,
+           seed=42, max_fes=60_000)     # hard cap
+best, fitness, convergence = algo.optimize()
+print(algo.n_fes)                        # never exceeds 60,000
+```
+
+### Calibrate iterations to a budget
+
+Capping alone truncates annealing schedules. `calibrate_iterations` measures an
+algorithm's cost from two short probes and returns the iteration count that spends
+the budget exactly:
+
+```python
+from heurilab.core.budget import calibrate_iterations, budget_report
+
+iters, per_iter = calibrate_iterations(GWO, max_fes=60_000, pop_size=30, dim=30)
+print(iters, per_iter)          # 2000, 30.0
+
+print(budget_report(ALL_ALGORITHMS[:10], max_fes=60_000))
+```
+
+`run_experiment(max_fes=...)` does this automatically for every algorithm.
+
+**Measured effect:** over 29 CEC 2017 functions at 30-D, Harmony Search ranks
+**9th of 10** at equal iterations and **3rd** at an equal evaluation budget.
+
+---
+
+## 🔁 Reproducibility & Parallelism
+
+A single seed reproduces an entire campaign, not just one run. Each run's seed is
+derived from its (function, algorithm, run) coordinates *before* any work starts,
+so execution order cannot reach the result.
+
+```python
+run_experiment(
+    algorithms=[("PSO", PSO), ("GWO", GWO)],
+    benchmark_suites=[suite],
+    n_runs=30,
+    seed=42,        # the whole campaign regenerates exactly
+    n_jobs=-1,      # identical results, on every core
+)
+```
+
+Serial and parallel execution produce a **byte-identical** results table, including
+every convergence trace. Verified in `tests/test_parallel.py`.
+
+Because the seed is a function of the coordinates and not of position in a queue,
+adding a function, removing an algorithm, or resuming an interrupted campaign leaves
+every other cell untouched.
+
+---
+
+## 📊 Behavioural Analysis
+
+### Six-panel qualitative figure
+
+Landscape, search history, mean fitness, variable trajectory, convergence, and the
+exploration/exploitation balance — all measured from one instrumented run of *any*
+algorithm, including one you just wrote.
+
+```python
+from heurilab.analyzer import qualitative_analysis, plot_qualitative
+
+a = qualitative_analysis(("GWO", GWO),
+                         ("F9 Rastrigin", rastrigin, -5.12, 5.12),
+                         pop_size=30, max_iter=100)
+plot_qualitative(a, layout="grid", font_scale=1.9)
+
+print(a.mean_exploration)        # mean XPL%, after Hussain et al. (2019)
+print(a.crossover_iteration)     # when exploitation overtakes exploration
+```
+
+Single-solution methods report `NaN` rather than a misleading 0%.
+
+### Measured control law
+
+Papers usually plot the exploration coefficient from its formula. This measures what
+the implementation actually did:
+
+```python
+from heurilab.analyzer import coefficient_plot, exploration_trace
+
+trace = exploration_trace("GWO", GWO, dim=30, pop_size=30, max_iter=500)
+print(trace.contraction)         # late dispersion / early dispersion
+coefficient_plot("GWO", GWO, max_iter=500)   # overlays the linear envelope
+```
+
+---
+
+## 🧬 Structural Novelty Auditing
+
+Implements the 19 metaphor-free structural criteria of Soto Calvo & Lee (2026),
+derived from **implementations** rather than published descriptions. Use it on your
+own algorithm before you submit it.
+
+```python
+from heurilab.taxonomy import check_novelty, compare
+
+report = check_novelty(("MyAlgorithm", MyAlgorithm))
+print(report.verdict)
+for name, distance in report.neighbours:
+    print(name, round(distance, 3), report.differing_criteria[name])
+
+d, differing = compare(("WOA", WOA), ("GWO", GWO))
+```
+
+Every bit carries a confidence and an evidence string, so a detection can be reviewed
+rather than trusted blindly.
+
+> **Read a zero distance as a screening result, not a verdict.** Applied to this
+> registry, 98 algorithms resolve into only 48 distinct fingerprints — four of the 19
+> criteria are constant across a modern continuous-optimisation catalogue, so the
+> effective resolution is closer to ten bits. It narrows the field to a handful of
+> candidates a human should read.
 
 ---
 
