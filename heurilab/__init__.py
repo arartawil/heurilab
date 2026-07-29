@@ -27,10 +27,31 @@ from heurilab.core.cec2017 import (
     get_cec2017_multimodal_suite, get_cec2017_hybrid_suite,
     get_cec2017_composition_suite,
 )
+from heurilab.core.cec2020 import (
+    CEC20_F1, CEC20_F2, CEC20_F3, CEC20_F4, CEC20_F5,
+    CEC20_F6, CEC20_F7, CEC20_F8, CEC20_F9, CEC20_F10,
+    CEC2020_FUNCTIONS,
+    get_cec2020_suite, get_cec2020_unimodal_suite,
+    get_cec2020_multimodal_suite, get_cec2020_hybrid_suite,
+    get_cec2020_composition_suite,
+)
+from heurilab.core.budget import (
+    budget_report, calibrate_all, calibrate_iterations,
+    measure_evals_per_iteration,
+)
+from heurilab.core.opfunu_suites import (
+    OPFUNU_YEARS, get_opfunu_suite, list_opfunu_functions, get_opfunu_optimum,
+    get_cec2014_opfunu_suite, get_cec2017_opfunu_suite, get_cec2020_opfunu_suite,
+    get_cec2021_opfunu_suite, get_cec2022_opfunu_suite,
+)
+from heurilab.engineering.problems import (
+    EngineeringProblem, PROBLEMS as ENGINEERING_PROBLEM_SET,
+    get_engineering_problems,
+)
 from heurilab.analyzer import enhance
 from heurilab.analyzer import cec2017_benchmarks
 
-__version__ = "2.0.1"
+__version__ = "2.3.0"
 __all__ = [
     "run_experiment", "BenchmarkConfig", "BenchmarkSuite",
     # Classical F1–F23
@@ -52,6 +73,22 @@ __all__ = [
     "get_cec2017_suite", "get_cec2017_unimodal_suite",
     "get_cec2017_multimodal_suite", "get_cec2017_hybrid_suite",
     "get_cec2017_composition_suite",
+    # CEC 2020
+    "CEC20_F1", "CEC20_F2", "CEC20_F3", "CEC20_F4", "CEC20_F5",
+    "CEC20_F6", "CEC20_F7", "CEC20_F8", "CEC20_F9", "CEC20_F10",
+    "CEC2020_FUNCTIONS",
+    "get_cec2020_suite", "get_cec2020_unimodal_suite",
+    "get_cec2020_multimodal_suite", "get_cec2020_hybrid_suite",
+    "get_cec2020_composition_suite",
+    # Function-evaluation budgets
+    "calibrate_iterations", "calibrate_all", "budget_report",
+    "measure_evals_per_iteration",
+    # CEC via opfunu (optional dependency)
+    "OPFUNU_YEARS", "get_opfunu_suite", "list_opfunu_functions", "get_opfunu_optimum",
+    "get_cec2014_opfunu_suite", "get_cec2017_opfunu_suite", "get_cec2020_opfunu_suite",
+    "get_cec2021_opfunu_suite", "get_cec2022_opfunu_suite",
+    # Engineering design problems
+    "EngineeringProblem", "ENGINEERING_PROBLEM_SET", "get_engineering_problems",
     # Analyzer
     "enhance",
 ]

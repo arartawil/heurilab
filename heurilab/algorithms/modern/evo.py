@@ -21,26 +21,26 @@ class EVO(_Base):
             a = 2 * (1 - t / self.max_iter)  # linearly decreasing
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.5:
                     # Generation phase: particles fall into energy valley
                     # Potential energy drives movement toward best
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random(self.dim)
                     distance = np.abs(best - X[i])
                     # Kinetic energy component
                     KE = 0.5 * decay * distance ** 2
                     new_X = X[i] + r1 * KE * np.sign(best - X[i]) + r2 * a * (best - X[i])
                 else:
-                    if np.random.rand() < decay:
+                    if self.rng.random() < decay:
                         # Transition phase: electron tunneling (exploration)
-                        j = np.random.randint(self.pop_size)
+                        j = self.rng.integers(self.pop_size)
                         sigma = np.abs(X[j] - X[i]) * decay + 1e-16
-                        new_X = best + sigma * np.random.randn(self.dim)
+                        new_X = best + sigma * self.rng.standard_normal(self.dim)
                     else:
                         # Absorption phase: settling into valley (exploitation)
-                        r1 = np.random.rand(self.dim)
+                        r1 = self.rng.random(self.dim)
                         C = 2 * r1 - 1
                         new_X = best + C * decay * (self.ub - self.lb) * 0.01
 

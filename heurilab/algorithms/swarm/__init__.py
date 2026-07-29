@@ -15,7 +15,6 @@ DA   — Dragonfly Algorithm
 GOA  — Grasshopper Optimization Algorithm
 ALO  — Ant Lion Optimizer
 SHO  — Spotted Hyena Optimizer
-DO   — Dolphin Optimizer
 EHO  — Elephant Herding Optimization
 AO   — Aquila Optimizer
 HGS  — Hunger Games Search
@@ -37,7 +36,6 @@ from heurilab.algorithms.swarm.da import DA
 from heurilab.algorithms.swarm.goa import GOA
 from heurilab.algorithms.swarm.alo import ALO
 from heurilab.algorithms.swarm.sho import SHO
-from heurilab.algorithms.swarm.do import DO
 from heurilab.algorithms.swarm.eho import EHO
 from heurilab.algorithms.swarm.ao import AO
 from heurilab.algorithms.swarm.hgs import HGS
@@ -46,5 +44,5 @@ from heurilab.algorithms.swarm.run import RUN
 
 __all__ = ["PSO", "GWO", "WOA", "MFO", "SSA", "HHO", "MPA",
            "BA", "CS", "FPA", "DA", "GOA",
-           "ALO", "SHO", "DO", "EHO",
+           "ALO", "SHO", "EHO",
            "AO", "HGS", "GTO", "RUN"]

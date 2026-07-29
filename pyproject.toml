@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heurilab"
-version = "2.0.3"
-description = "100 metaheuristic optimization algorithms with automated experiment runner, CSV, plots & statistical analysis"
+dynamic = ["version"]
+description = "98 metaheuristic optimization algorithms with a reproducible experiment runner, evaluation-budget fairness, behavioural diagnosis and structural novelty auditing"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
@@ -15,7 +15,8 @@ authors = [
 keywords = [
     "metaheuristic", "optimization", "swarm-intelligence",
     "evolutionary-algorithm", "benchmark", "convergence",
-    "statistical-analysis", "CEC2017",
+    "statistical-analysis", "CEC2017", "CEC2022", "parallel",
+    "taxonomy", "novelty-detection", "algorithm-similarity",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -44,11 +45,20 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "build", "twine"]
+cec = ["opfunu>=1.0.0"]        # CEC 2005-2022 suites (heurilab.get_opfunu_suite)
+parallel = ["joblib"]           # run_experiment(n_jobs=...)
+all = ["opfunu>=1.0.0", "joblib"]
 
 [project.urls]
 Homepage = "https://github.com/arartawil/heurilab"
 Repository = "https://github.com/arartawil/heurilab"
 Issues = "https://github.com/arartawil/heurilab/issues"
 
+[tool.setuptools.dynamic]
+version = {attr = "heurilab.__version__"}
+
 [tool.setuptools.packages.find]
 include = ["heurilab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

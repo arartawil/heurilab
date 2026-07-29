@@ -20,28 +20,28 @@ class MOA(_Base):
             beta = 0.5 * (1 + t / self.max_iter)  # independence factor
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.33:
                     # Phase 1: Nurturing — mother guides child toward best
-                    r1 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
                     new_X = X[i] + alpha * r1 * (best - X[i])
                 elif r < 0.66:
                     # Phase 2: Education — learn from random members
-                    j = np.random.randint(self.pop_size)
-                    k = np.random.randint(self.pop_size)
-                    r1 = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    k = self.rng.integers(self.pop_size)
+                    r1 = self.rng.random(self.dim)
                     if fitness[j] < fitness[k]:
                         new_X = X[i] + r1 * (X[j] - X[k]) * alpha
                     else:
                         new_X = X[i] + r1 * (X[k] - X[j]) * alpha
                 else:
                     # Phase 3: Independence — child explores on its own
-                    r1 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
                     sigma = (self.ub - self.lb) * (1 - t / self.max_iter) * 0.1
-                    new_X = X[i] + sigma * np.random.randn(self.dim) * beta
+                    new_X = X[i] + sigma * self.rng.standard_normal(self.dim) * beta
                     # With some probability move toward best
-                    if np.random.rand() < 0.5:
+                    if self.rng.random() < 0.5:
                         new_X = new_X + r1 * (best - new_X) * (1 - alpha)
 
                 new_X = self._clip(new_X)

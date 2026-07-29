@@ -19,17 +19,17 @@ class GWO(_Base):
             a = 2 - 2 * t / self.max_iter
 
             for i in range(self.pop_size):
-                r1, r2 = np.random.rand(self.dim), np.random.rand(self.dim)
+                r1, r2 = self.rng.random(self.dim), self.rng.random(self.dim)
                 A1, C1 = 2 * a * r1 - a, 2 * r2
                 D_alpha = np.abs(C1 * alpha - X[i])
                 X1 = alpha - A1 * D_alpha
 
-                r1, r2 = np.random.rand(self.dim), np.random.rand(self.dim)
+                r1, r2 = self.rng.random(self.dim), self.rng.random(self.dim)
                 A2, C2 = 2 * a * r1 - a, 2 * r2
                 D_beta = np.abs(C2 * beta - X[i])
                 X2 = beta - A2 * D_beta
 
-                r1, r2 = np.random.rand(self.dim), np.random.rand(self.dim)
+                r1, r2 = self.rng.random(self.dim), self.rng.random(self.dim)
                 A3, C3 = 2 * a * r1 - a, 2 * r2
                 D_delta = np.abs(C3 * delta - X[i])
                 X3 = delta - A3 * D_delta

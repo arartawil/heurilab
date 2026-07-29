@@ -28,18 +28,18 @@ class FLA(_Base):
                 if i < n1:
                     # First half: Fick's first law (exploitation)
                     # Diffusion from high to low concentration (toward best)
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand()
-                    j = sorted_idx[np.random.randint(max(1, n1 // 2))]  # random good solution
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random()
+                    j = sorted_idx[self.rng.integers(max(1, n1 // 2))]  # random good solution
                     grad = X[j] - X[i]
                     new_X = X[i] + D * r1 * grad + r2 * TF * (best - X[i])
                 else:
                     # Second half: Fick's second law (exploration)
                     # Concentration change over time
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand(self.dim)
-                    j = np.random.randint(self.pop_size)
-                    k = np.random.randint(self.pop_size)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    k = self.rng.integers(self.pop_size)
                     new_X = X[i] + D * (r1 * (X[j] - X[k]) + r2 * (best - X[i])) * TF
 
                 new_X = self._clip(new_X)

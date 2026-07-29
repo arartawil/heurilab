@@ -39,10 +39,10 @@ class GSA(_Base):
                 for j in sorted_idx:
                     if i != j:
                         R = np.linalg.norm(X[i] - X[j]) + eps
-                        force[i] += np.random.rand(self.dim) * G * mass[j] * (X[j] - X[i]) / R
+                        force[i] += self.rng.random(self.dim) * G * mass[j] * (X[j] - X[i]) / R
 
             acc = force / (mass.reshape(-1, 1) + eps)
-            V = np.random.rand(self.pop_size, self.dim) * V + acc
+            V = self.rng.random((self.pop_size, self.dim)) * V + acc
             X = self._clip(X + V)
 
             fitness = np.array([self._eval(X[i]) for i in range(self.pop_size)])

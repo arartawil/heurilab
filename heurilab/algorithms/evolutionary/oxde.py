@@ -20,7 +20,7 @@ class OXDE(_Base):
 
         for t in range(self.max_iter):
             # Opposition-based population jump
-            if np.random.rand() < Jr:
+            if self.rng.random() < Jr:
                 a = np.min(X, axis=0)
                 b = np.max(X, axis=0)
                 opp_X = a + b - X
@@ -38,14 +38,14 @@ class OXDE(_Base):
             for i in range(self.pop_size):
                 idxs = list(range(self.pop_size))
                 idxs.remove(i)
-                r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
+                r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
 
                 mutant = self._clip(X[r1] + F * (X[r2] - X[r3]))
 
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR or j == j_rand:
+                    if self.rng.random() < CR or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

@@ -17,29 +17,29 @@ class WHO(_Base):
 
         for t in range(self.max_iter):
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.3:
                     # Grazing: local search around current position
                     scale = (self.ub - self.lb) * 0.05 * (1 - t / self.max_iter)
-                    new_X = X[i] + np.random.randn(self.dim) * scale
+                    new_X = X[i] + self.rng.standard_normal(self.dim) * scale
                 elif r < 0.6:
                     # Migration toward best pasture (best solution)
-                    phi = np.random.rand(self.dim)
+                    phi = self.rng.random(self.dim)
                     new_X = X[i] + phi * (best - X[i])
                 elif r < 0.9:
                     # Herd interaction: move toward random herd member
-                    j = np.random.randint(self.pop_size)
+                    j = self.rng.integers(self.pop_size)
                     while j == i:
-                        j = np.random.randint(self.pop_size)
-                    r2 = np.random.rand(self.dim)
+                        j = self.rng.integers(self.pop_size)
+                    r2 = self.rng.random(self.dim)
                     if fitness[j] < fitness[i]:
                         new_X = X[i] + r2 * (X[j] - X[i])
                     else:
                         new_X = X[i] + r2 * (X[i] - X[j])
                 else:
                     # Predator escape: random jump
-                    new_X = np.random.uniform(self.lb, self.ub, self.dim)
+                    new_X = self.rng.uniform(self.lb, self.ub, self.dim)
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

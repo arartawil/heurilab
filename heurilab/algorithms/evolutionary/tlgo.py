@@ -23,8 +23,8 @@ class TLGO(_Base):
 
             # ── Teaching phase ──
             for i in range(self.pop_size):
-                TF = np.random.randint(1, 3)
-                r = np.random.rand(self.dim)
+                TF = self.rng.integers(1, 3)
+                r = self.rng.random(self.dim)
                 new_X = X[i] + r * (teacher - TF * mean_X)
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
@@ -34,8 +34,8 @@ class TLGO(_Base):
 
             # ── Genetic crossover phase ──
             for i in range(0, self.pop_size - 1, 2):
-                if np.random.rand() < pc:
-                    alpha = np.random.rand(self.dim)
+                if self.rng.random() < pc:
+                    alpha = self.rng.random(self.dim)
                     c1 = alpha * X[i] + (1 - alpha) * X[i + 1]
                     c2 = (1 - alpha) * X[i] + alpha * X[i + 1]
                     c1 = self._clip(c1)
@@ -51,9 +51,9 @@ class TLGO(_Base):
 
             # ── Mutation phase ──
             for i in range(self.pop_size):
-                if np.random.rand() < pm:
-                    j = np.random.randint(self.dim)
-                    X[i, j] = np.random.uniform(self.lb[j], self.ub[j])
+                if self.rng.random() < pm:
+                    j = self.rng.integers(self.dim)
+                    X[i, j] = self.rng.uniform(self.lb[j], self.ub[j])
                     fitness[i] = self._eval(X[i])
 
             min_idx = np.argmin(fitness)

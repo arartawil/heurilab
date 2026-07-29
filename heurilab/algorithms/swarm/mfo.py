@@ -25,7 +25,7 @@ class MFO(_Base):
             for i in range(self.pop_size):
                 flame_idx = min(i, n_flames - 1)
                 D = np.abs(flames[flame_idx] - X[i])
-                tt = np.random.uniform(-1, 1, self.dim)
+                tt = self.rng.uniform(-1, 1, self.dim)
                 X[i] = D * np.exp(b * tt) * np.cos(2 * np.pi * tt) + flames[flame_idx]
                 X[i] = self._clip(X[i])
 

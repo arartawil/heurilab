@@ -23,20 +23,20 @@ class SAO(_Base):
             for i in range(self.pop_size):
                 if i in sorted_idx[:N_elite]:
                     # Elite snow (sublimation — exploitation)
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand()
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random()
                     new_X = best + r1 * (best - X[i]) * T * np.log(1 + r2)
                 else:
                     # Non-elite snow (melting — exploration)
-                    j = np.random.randint(self.pop_size)
-                    k = np.random.randint(self.pop_size)
-                    r = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    k = self.rng.integers(self.pop_size)
+                    r = self.rng.random(self.dim)
 
                     if fitness[j] < fitness[i]:
                         new_X = X[i] + r * (X[j] - X[k]) * (1 - t / self.max_iter)
                     else:
                         # Random ablation
-                        new_X = X[i] + np.random.randn(self.dim) * (self.ub - self.lb) * T * 0.1
+                        new_X = X[i] + self.rng.standard_normal(self.dim) * (self.ub - self.lb) * T * 0.1
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

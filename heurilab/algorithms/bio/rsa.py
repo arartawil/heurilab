@@ -21,25 +21,25 @@ class RSA(_Base):
             alpha = 2 * (1 - t / self.max_iter)  # exploration factor
             beta = 2 * (t / self.max_iter)  # exploitation factor
 
-            ES = 2 * np.random.rand() - 1  # evolutionary sense
+            ES = 2 * self.rng.random() - 1  # evolutionary sense
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
-                r_idx = np.random.randint(self.pop_size)
+                r1 = self.rng.random()
+                r_idx = self.rng.integers(self.pop_size)
 
                 if t < self.max_iter / 4:
                     # Phase 1: High walking
                     new_X = best * (1 - t / self.max_iter) + \
-                            np.random.rand(self.dim) * (X[r_idx] - best) * np.random.rand()
+                            self.rng.random(self.dim) * (X[r_idx] - best) * self.rng.random()
                 elif t < self.max_iter / 2:
                     # Phase 2: Belly walking
-                    new_X = best * X[r_idx] * ES * np.random.rand(self.dim)
+                    new_X = best * X[r_idx] * ES * self.rng.random(self.dim)
                 elif t < 3 * self.max_iter / 4:
                     # Phase 3: Hunting coordination
-                    new_X = best * alpha + X[r_idx] * np.random.rand() * beta
+                    new_X = best * alpha + X[r_idx] * self.rng.random() * beta
                 else:
                     # Phase 4: Hunting cooperation
-                    new_X = best * X[r_idx] * alpha * np.random.rand(self.dim)
+                    new_X = best * X[r_idx] * alpha * self.rng.random(self.dim)
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

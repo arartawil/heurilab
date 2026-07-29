@@ -19,20 +19,20 @@ class HO(_Base):
             T = 1 - t / self.max_iter  # time factor
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.33:
                     # Phase 1: Position update in river/pond (exploitation)
                     # Hippo moves in water near the dominant hippo
-                    r1 = np.random.rand(self.dim)
-                    I = np.random.choice([1, 2])
+                    r1 = self.rng.random(self.dim)
+                    I = self.rng.choice([1, 2])
                     new_X = X[i] + r1 * (best - I * X[i])
 
                 elif r < 0.66:
                     # Phase 2: Defense against predators (exploration)
                     # Hippo defends territory aggressively
-                    j = np.random.randint(self.pop_size)
-                    r1 = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    r1 = self.rng.random(self.dim)
 
                     if fitness[j] < fitness[i]:
                         new_X = X[i] + r1 * (X[j] - X[i]) * T
@@ -42,11 +42,11 @@ class HO(_Base):
                 else:
                     # Phase 3: Escaping from predator (diversification)
                     # Hippo runs to random safe location
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random(self.dim)
                     A = 2 * r1 * T - T  # adaptive coefficient
                     mu = np.mean(X, axis=0)
-                    new_X = best + A * (best - mu) + r2 * np.random.randn(self.dim) * T
+                    new_X = best + A * (best - mu) + r2 * self.rng.standard_normal(self.dim) * T
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

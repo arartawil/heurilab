@@ -32,7 +32,7 @@ def init_csv_files(output_dir: str, max_iter: int):
     with open(paths["raw_runs"], "w", newline="") as f:
         writer = csv.writer(f)
         conv_headers = [f"Conv_{i}" for i in range(max_iter + 1)]
-        writer.writerow(["Benchmark", "Algorithm", "Run", "BestFitness", "Time_s"] + conv_headers)
+        writer.writerow(["Benchmark", "Algorithm", "Run", "Seed", "FEs", "BestFitness", "Time_s"] + conv_headers)
 
     # convergence.csv header
     with open(paths["convergence"], "w", newline="") as f:
@@ -55,12 +55,15 @@ def _pad_or_trim(conv: list, length: int) -> list:
 
 def append_raw_run(csv_path: str, benchmark_name: str, algo_name: str,
                    run_idx: int, best_fitness: float, elapsed: float,
-                   convergence: list, max_iter: int):
+                   convergence: list, max_iter: int, seed=None, n_fes=None):
     """Append one run to raw_runs.csv."""
     conv = _pad_or_trim(convergence, max_iter + 1)
     with open(csv_path, "a", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([benchmark_name, algo_name, run_idx + 1, best_fitness, f"{elapsed:.4f}"] + conv)
+        writer.writerow([benchmark_name, algo_name, run_idx + 1,
+                         "" if seed is None else seed,
+                         "" if n_fes is None else n_fes,
+                         best_fitness, f"{elapsed:.4f}"] + conv)
 
 
 def append_results(csv_path: str, benchmark_name: str, algo_name: str,

@@ -4,6 +4,7 @@ Runner for engineering design problems.
 
 import os
 import time
+import hashlib
 import numpy as np
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -13,6 +14,33 @@ from typing import List, Tuple, Type
 from heurilab.exporters.plots import plot_convergence, plot_boxplot
 from heurilab.exporters.csv_export import _pad_or_trim
 from heurilab.engineering.problems import ENGINEERING_PROBLEMS
+
+
+def _engineering_run(algo_class, spec, seed):
+    """One engineering run. Module-level so worker processes can import it.
+
+    Unlike the benchmark runner this does return the solution vector, because
+    the design variables at the optimum are the point of an engineering table.
+    """
+    if seed is not None:
+        np.random.seed(seed % (2 ** 32))
+    algo = algo_class(seed=seed, **spec)
+    sol, fit, conv = algo.optimize()
+    return list(np.asarray(sol, dtype=float)), float(fit), list(conv)
+
+
+def _execute_engineering(algo_class, spec, seeds, n_jobs):
+    if n_jobs == 1:
+        return (_engineering_run(algo_class, spec, s) for s in seeds)
+    try:
+        from joblib import Parallel, delayed
+    except ImportError as exc:
+        raise ImportError(
+            "n_jobs != 1 requires the optional 'joblib' package.\n"
+            "    pip install joblib   (or: pip install heurilab[parallel])"
+        ) from exc
+    return Parallel(n_jobs=n_jobs, prefer="processes")(
+        delayed(_engineering_run)(algo_class, spec, s) for s in seeds)
 
 # ── Style constants ──────────────────────────────────────────────────
 _HEADER_FILL = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
@@ -53,7 +81,7 @@ def _auto_width(ws):
 def run_engineering_problems(algo_name: str, algo_class: Type,
                              output_dir: str,
                              pop_size: int = 50, max_iter: int = 500,
-                             n_runs: int = 30):
+                             n_runs: int = 30, seed=None, n_jobs: int = 1):
     """
     Run engineering design problems using the proposed algorithm only.
     Generates Excel + plots per problem.
@@ -70,13 +98,22 @@ def run_engineering_problems(algo_name: str, algo_class: Type,
         best_solutions = []
         all_convergences = []
 
-        for run in range(n_runs):
-            algo = algo_class(pop_size=pop_size, dim=dim,
-                              lb=lb_arr, ub=ub_arr,
-                              max_iter=max_iter, obj_func=obj_func)
-            sol, fit, conv = algo.optimize()
-            conv = list(conv)
-            conv = _pad_or_trim(conv, max_iter + 1)
+        run_seeds = [
+            None if seed is None else int(
+                np.random.SeedSequence(
+                    [seed,
+                     int(hashlib.sha256(prob_name.encode()).hexdigest()[:8], 16),
+                     int(hashlib.sha256(algo_name.encode()).hexdigest()[:8], 16),
+                     run]
+                ).generate_state(1)[0]
+            )
+            for run in range(n_runs)
+        ]
+        spec = dict(pop_size=pop_size, dim=dim, lb=lb_arr, ub=ub_arr,
+                    max_iter=max_iter, obj_func=obj_func)
+
+        for sol, fit, conv in _execute_engineering(algo_class, spec, run_seeds, n_jobs):
+            conv = _pad_or_trim(list(conv), max_iter + 1)
             best_fitnesses.append(fit)
             best_solutions.append(list(sol))
             all_convergences.append(conv)
@@ -85,7 +122,7 @@ def run_engineering_problems(algo_name: str, algo_class: Type,
         best_idx = int(np.argmin(arr))
 
         # ── Summary sheet ──
-        ws = wb.create_sheet(title=f"{prob_name[:25]} Summary")
+        ws = wb.create_sheet(title=f"{prob_name[:23]} Summary")
         ws.cell(row=1, column=1, value="Metric")
         ws.cell(row=1, column=2, value="Value")
         _style_header(ws, 1, 2)
@@ -100,7 +137,7 @@ def run_engineering_problems(algo_name: str, algo_class: Type,
         _auto_width(ws)
 
         # ── Optimal Variables sheet ──
-        ws2 = wb.create_sheet(title=f"{prob_name[:25]} Vars")
+        ws2 = wb.create_sheet(title=f"{prob_name[:26]} Vars")
         ws2.cell(row=1, column=1, value="Variable")
         ws2.cell(row=1, column=2, value="Optimal Value")
         _style_header(ws2, 1, 2)
@@ -112,7 +149,7 @@ def run_engineering_problems(algo_name: str, algo_class: Type,
         _auto_width(ws2)
 
         # ── All 30 Runs sheet ──
-        ws3 = wb.create_sheet(title=f"{prob_name[:25]} Runs")
+        ws3 = wb.create_sheet(title=f"{prob_name[:26]} Runs")
         ws3.cell(row=1, column=1, value="Run")
         ws3.cell(row=1, column=2, value="Best Fitness")
         for v in range(dim):
@@ -128,7 +165,7 @@ def run_engineering_problems(algo_name: str, algo_class: Type,
         _auto_width(ws3)
 
         # ── Convergence data sheet ──
-        ws4 = wb.create_sheet(title=f"{prob_name[:25]} Conv")
+        ws4 = wb.create_sheet(title=f"{prob_name[:26]} Conv")
         mean_conv = np.mean(all_convergences, axis=0)
         ws4.cell(row=1, column=1, value="Iteration")
         ws4.cell(row=1, column=2, value="Mean Fitness")

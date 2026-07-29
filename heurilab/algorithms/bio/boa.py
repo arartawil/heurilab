@@ -30,14 +30,14 @@ class BOA(_Base):
                 I = fitness[i]
                 fragrance = c_val * (I ** a)
 
-                r = np.random.rand()
+                r = self.rng.random()
                 if r < p:
                     # Global search: move toward best
-                    new_X = X[i] + (np.random.rand(self.dim) ** 2) * fragrance * (best - X[i])
+                    new_X = X[i] + (self.rng.random(self.dim) ** 2) * fragrance * (best - X[i])
                 else:
                     # Local search: move toward random neighbour
-                    j, k = np.random.randint(0, self.pop_size, 2)
-                    new_X = X[i] + (np.random.rand(self.dim) ** 2) * fragrance * (X[j] - X[k])
+                    j, k = self.rng.integers(0, self.pop_size, 2)
+                    new_X = X[i] + (self.rng.random(self.dim) ** 2) * fragrance * (X[j] - X[k])
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

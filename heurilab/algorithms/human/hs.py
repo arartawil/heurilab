@@ -25,17 +25,17 @@ class HS(_Base):
 
             new_harmony = np.zeros(self.dim)
             for j in range(self.dim):
-                if np.random.rand() < HMCR:
+                if self.rng.random() < HMCR:
                     # Memory consideration
-                    idx = np.random.randint(self.pop_size)
+                    idx = self.rng.integers(self.pop_size)
                     new_harmony[j] = X[idx, j]
 
                     # Pitch adjustment
-                    if np.random.rand() < PAR:
-                        new_harmony[j] += bw_t * (self.ub[j] - self.lb[j]) * (2 * np.random.rand() - 1)
+                    if self.rng.random() < PAR:
+                        new_harmony[j] += bw_t * (self.ub[j] - self.lb[j]) * (2 * self.rng.random() - 1)
                 else:
                     # Random selection
-                    new_harmony[j] = np.random.uniform(self.lb[j], self.ub[j])
+                    new_harmony[j] = self.rng.uniform(self.lb[j], self.ub[j])
 
             new_harmony = self._clip(new_harmony)
             new_fit = self._eval(new_harmony)

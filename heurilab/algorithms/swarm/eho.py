@@ -18,7 +18,7 @@ class EHO(_Base):
         best_fit = fitness[best_idx]
 
         # Assign to clans
-        clans = np.random.randint(0, n_clans, self.pop_size)
+        clans = self.rng.integers(0, n_clans, self.pop_size)
 
         convergence = [best_fit]
 
@@ -40,7 +40,7 @@ class EHO(_Base):
                         new_X = beta_eho * clan_center
                     else:
                         # Other elephants move toward matriarch
-                        r = np.random.rand()
+                        r = self.rng.random()
                         new_X = X[idx] + alpha_eho * r * (X[matriarch_idx] - X[idx])
 
                     new_X = self._clip(new_X)
@@ -56,7 +56,7 @@ class EHO(_Base):
                 if len(members) == 0:
                     continue
                 worst_in_clan = members[np.argmax(fitness[members])]
-                X[worst_in_clan] = np.random.uniform(self.lb, self.ub, self.dim)
+                X[worst_in_clan] = self.rng.uniform(self.lb, self.ub, self.dim)
                 fitness[worst_in_clan] = self._eval(X[worst_in_clan])
 
             min_idx = np.argmin(fitness)

@@ -1,7 +1,7 @@
 """IMODE — Improved Multi-Operator Differential Evolution (Sallam et al., 2020)"""
 
 import numpy as np
-from heurilab.algorithms.base import _Base
+from heurilab.algorithms.base import _Base, roulette_probabilities
 
 
 class IMODE(_Base):
@@ -26,40 +26,40 @@ class IMODE(_Base):
         for t in range(self.max_iter):
             # Adaptive probabilities based on success rates
             p_total = ns / (ns + nf + 1e-16)
-            p_total = p_total / (np.sum(p_total) + 1e-16)
+            p_total = roulette_probabilities(p_total)
 
             ns_new = np.zeros(n_ops)
             nf_new = np.zeros(n_ops)
 
             for i in range(self.pop_size):
                 # Select operator
-                op = np.random.choice(n_ops, p=p_total)
+                op = self.rng.choice(n_ops, p=p_total)
 
-                F_i = 0.1 + 0.9 * np.random.rand()
-                CR_i = np.random.rand()
+                F_i = 0.1 + 0.9 * self.rng.random()
+                CR_i = self.rng.random()
 
                 idxs = list(range(self.pop_size))
                 idxs.remove(i)
 
                 if op == 0:
                     # DE/rand/1
-                    r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
+                    r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
                     mutant = X[r1] + F_i * (X[r2] - X[r3])
                 elif op == 1:
                     # DE/current-to-best/1
-                    r1, r2 = np.random.choice(idxs, 2, replace=False)
+                    r1, r2 = self.rng.choice(idxs, 2, replace=False)
                     mutant = X[i] + F_i * (best - X[i]) + F_i * (X[r1] - X[r2])
                 else:
                     # DE/rand-to-best/1
-                    r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
+                    r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
                     mutant = X[r1] + F_i * (best - X[r1]) + F_i * (X[r2] - X[r3])
 
                 mutant = self._clip(mutant)
 
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR_i or j == j_rand:
+                    if self.rng.random() < CR_i or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

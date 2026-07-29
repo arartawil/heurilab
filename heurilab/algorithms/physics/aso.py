@@ -48,7 +48,7 @@ class ASO(_Base):
                     attract = -alpha_aso * (h ** 6)
                     repel = alpha_aso * (h ** 12) * 0.5
 
-                    f_ij = (attract + repel) * np.random.rand()
+                    f_ij = (attract + repel) * self.rng.random()
                     direction = (X[j] - X[i]) / (r_ij + eps)
                     force[i] += f_ij * mass[j] * direction
 
@@ -57,7 +57,7 @@ class ASO(_Base):
 
             accel = force / (mass.reshape(-1, 1) + eps) + G * (best - X)
 
-            V = np.random.rand(self.pop_size, self.dim) * V + accel
+            V = self.rng.random((self.pop_size, self.dim)) * V + accel
             X = self._clip(X + V)
 
             fitness = np.array([self._eval(X[i]) for i in range(self.pop_size)])

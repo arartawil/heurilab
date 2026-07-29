@@ -20,9 +20,9 @@ class SCA(_Base):
             r1 = a - a * t / self.max_iter
 
             for i in range(self.pop_size):
-                r2 = 2 * np.pi * np.random.rand(self.dim)
-                r3 = 2 * np.random.rand(self.dim)
-                r4 = np.random.rand(self.dim)
+                r2 = 2 * np.pi * self.rng.random(self.dim)
+                r3 = 2 * self.rng.random(self.dim)
+                r4 = self.rng.random(self.dim)
 
                 cond = r4 < 0.5
                 X[i] = np.where(cond,

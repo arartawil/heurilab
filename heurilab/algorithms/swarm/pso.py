@@ -24,8 +24,8 @@ class PSO(_Base):
 
         for t in range(self.max_iter):
             w = w_max - (w_max - w_min) * t / self.max_iter
-            r1 = np.random.rand(self.pop_size, self.dim)
-            r2 = np.random.rand(self.pop_size, self.dim)
+            r1 = self.rng.random((self.pop_size, self.dim))
+            r2 = self.rng.random((self.pop_size, self.dim))
 
             V = w * V + c1 * r1 * (pBest - X) + c2 * r2 * (gBest - X)
             X = self._clip(X + V)

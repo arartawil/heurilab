@@ -4,7 +4,7 @@
 
 **The Complete Metaheuristic Optimization Laboratory**
 
-*100 ready-to-use algorithms, 52 benchmark functions, automated experiments, statistical analysis & publication-ready outputs — all in one package*
+*98 ready-to-use algorithms, 248 benchmark functions, 12 verified engineering designs, evaluation-budget fairness, parallel reproducible campaigns, behavioural diagnosis and structural novelty auditing — all in one package*
 
 [![PyPI version](https://badge.fury.io/py/heurilab.svg)](https://badge.fury.io/py/heurilab)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -12,7 +12,7 @@
 [![Downloads](https://pepy.tech/badge/heurilab)](https://pepy.tech/project/heurilab)
 [![GitHub stars](https://img.shields.io/github/stars/arartawil/heurilab.svg?style=social&label=Star)](https://github.com/arartawil/heurilab)
 
-[📚 Algorithms](#-100-built-in-algorithms) • [🚀 Quick Start](#-quick-start) • [📊 Benchmarks](#-benchmark-suites) • [💡 Examples](#-complete-examples) • [🤝 Contributing](#-contributing)
+[📚 Algorithms](#-98-built-in-algorithms) • [🚀 Quick Start](#-quick-start) • [📊 Benchmarks](#-benchmark-suites) • [💡 Examples](#-complete-examples) • [🤝 Contributing](#-contributing)
 
 </div>
 
@@ -24,8 +24,12 @@
 
 ## ✨ Highlights
 
-🧠 **100 algorithms** across 6 categories — from classics (PSO, GA, DE) to cutting-edge 2024 optimizers  
-📐 **52 benchmarks** — 23 classical (F1–F23) + 29 CEC 2017 (F1, F3–F30)  
+🧠 **98 algorithms** across 6 categories — from classics (PSO, GA, DE) to cutting-edge 2024 optimizers  
+📐 **248 benchmarks** — 23 classical (F1–F23), 29 CEC 2017 + 10 CEC 2020 native, and 196 CEC functions across 11 editions (2005–2022) via `opfunu`, remapped to official numbering  
+🏗️ **12 constrained engineering designs** — every optimum verified against the originating paper  
+⚖️ **Evaluation-budget fairness** — `max_fes` caps evaluations and per-algorithm calibration keeps schedules intact; equal-iteration comparison spans a **396×** budget range across the registry  
+⚡ **Parallel and reproducible** — `n_jobs=-1` gives results identical to serial, because every run's seed is derived from its matrix coordinates before any work starts  
+🧬 **Structural novelty auditing** — score any algorithm, including your own, against 19 metaphor-free criteria  
 ⚡ **One-command experiments** — run, export CSVs, plot, and generate Excel stats automatically  
 📊 **Publication-ready outputs** — convergence curves, box plots, Wilcoxon & Friedman tests  
 🔧 **Real-time CSV saving** — data is written after every single run, never lost  
@@ -40,7 +44,7 @@
 
 | Feature | HeuriLab | MEALPY | PySwarms | SciPy |
 |---------|----------|--------|----------|-------|
-| **Algorithms** | ✅ 100 | ~200 | PSO only | Few |
+| **Algorithms** | ✅ 98 | ~200 | PSO only | Few |
 | **Benchmarks** | ✅ 52 (Classical + CEC 2017) | Limited | None | None |
 | **Automated Runner** | ✅ One function call | ❌ Manual | ❌ Manual | ❌ Manual |
 | **CSV + Excel Export** | ✅ Real-time | ❌ | ❌ | ❌ |
@@ -65,7 +69,7 @@
 - [Core Module](#-core-module)
   - [BenchmarkConfig & BenchmarkSuite](#benchmarkconfig--benchmarksuite)
   - [run_experiment() — Full API Reference](#run_experiment--full-api-reference)
-- [100 Built-in Algorithms](#-100-built-in-algorithms)
+- [98 Built-in Algorithms](#-98-built-in-algorithms)
   - [Base Class (_Base)](#base-class-_base)
   - [Swarm Intelligence (20)](#swarm-intelligence-20)
   - [Evolutionary (15)](#evolutionary-15)
@@ -219,22 +223,34 @@ run_experiment(
 ```
 heurilab/
 ├── __init__.py              # Public API re-exports
-├── algorithms/              # 100 metaheuristic algorithms (6 categories)
+├── algorithms/              # 98 metaheuristic algorithms (6 categories)
 │   ├── base.py              # _Base class — shared interface
-│   ├── swarm/               # 20 swarm intelligence algorithms
+│   ├── swarm/               # 19 swarm intelligence algorithms
 │   ├── evolutionary/        # 15 evolutionary algorithms
 │   ├── physics/             # 16 physics-based algorithms
-│   ├── human/               # 14 human/social algorithms
+│   ├── human/               # 13 human/social algorithms
 │   ├── bio/                 # 15 bio-inspired algorithms
 │   └── modern/              # 20 modern (2022–2025) algorithms
 ├── core/
 │   ├── benchmarks.py        # BenchmarkConfig, BenchmarkSuite
 │   ├── functions.py         # 23 classical benchmark functions
-│   ├── cec2017.py           # 29 CEC 2017 functions
+│   ├── cec2017.py           # 29 CEC 2017 functions (native)
+│   ├── cec2020.py           # 10 CEC 2020 functions (native)
+│   ├── opfunu_suites.py     # 196 CEC functions, 11 editions, official numbering
+│   ├── budget.py            # evaluation-budget calibration
 │   └── runner.py            # run_experiment() orchestrator
 ├── analyzer/
 │   ├── enhance.py           # Enhancement Advisor
+│   ├── qualitative.py       # six-panel behaviour figure
+│   ├── coefficients.py      # measured control-law / exploration traces
 │   └── _cec2017_tests.py    # CEC 2017 benchmark dict for enhance()
+├── taxonomy/                # structural novelty auditing
+│   ├── criteria.py          # 19 metaphor-free structural criteria
+│   ├── detect.py            # runtime + source feature detection
+│   ├── distance.py          # Rogers–Tanimoto distance
+│   ├── cluster.py           # UPGMA, silhouette, PCA
+│   ├── novelty.py           # check_novelty(), compare()
+│   └── report.py            # novelty report writer
 ├── exporters/
 │   ├── csv_export.py        # Real-time CSV output
 │   ├── plots.py             # Convergence curves & box plots
@@ -242,7 +258,7 @@ heurilab/
 ├── stats/
 │   └── tests.py             # Wilcoxon, Friedman, Nemenyi statistical tests
 └── engineering/
-    ├── problems.py          # 3 constrained engineering design problems
+    ├── problems.py          # 12 constrained engineering designs, optima verified
     └── runner.py            # Engineering problem runner
 ```
 
@@ -360,7 +376,7 @@ run_experiment(
 
 ---
 
-## 🧠 100 Built-in Algorithms
+## 🧠 98 Built-in Algorithms
 
 ```python
 from heurilab.algorithms import PSO, GWO, WOA, ...
@@ -430,7 +446,6 @@ def optimize(self) -> Tuple[np.ndarray, float, list]:
 | GOA  | Grasshopper Optimization Algorithm | Saremi et al., 2017        |
 | ALO  | Ant Lion Optimizer               | Mirjalili, 2015              |
 | SHO  | Spotted Hyena Optimizer          | Dhiman & Kumar, 2017         |
-| DO   | Dolphin Optimizer                | Shaqfa & Beyer, 2023         |
 | EHO  | Elephant Herding Optimization    | Wang et al., 2015            |
 | AO   | Aquila Optimizer                 | Abualigah et al., 2021       |
 | HGS  | Hunger Games Search              | Yang et al., 2021            |
@@ -488,8 +503,6 @@ def optimize(self) -> Tuple[np.ndarray, float, list]:
 | ICA    | Imperialist Competitive Algorithm | Atashpaz-Gargari & Lucas, 2007 |
 | CA     | Cultural Algorithm                | Reynolds, 1994               |
 | BSO    | Brain Storm Optimization          | Shi, 2011                    |
-| SOS_H  | Symbiotic Organisms Search        | Cheng & Prayogo, 2014        |
-| QLA    | Q-Learning Algorithm              | Watkins, 1989                |
 | INFO   | Weighted Mean of Vectors (INFO)   | Ahmadianfar et al., 2022     |
 | HBO    | Heap-Based Optimizer              | Askari et al., 2020          |
 | AOArch | Archimedes Optimization           | Hashim et al., 2021          |
@@ -552,10 +565,10 @@ from heurilab.algorithms import (
     HUMAN_ALGORITHMS,        # 14
     BIO_ALGORITHMS,          # 15
     MODERN_ALGORITHMS,       # 20
-    ALL_ALGORITHMS,          # 100 (all combined)
+    ALL_ALGORITHMS,          # 98 (all combined)
 )
 
-# Run all 100 algorithms
+# Run all 98 algorithms
 run_experiment(
     algorithms=ALL_ALGORITHMS,
     benchmark_suites=[get_classical_suite()],

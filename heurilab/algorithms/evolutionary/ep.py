@@ -18,7 +18,7 @@ class EP(_Base):
         for t in range(self.max_iter):
             # Mutation using Gaussian with adaptive step
             sigma = np.abs(X) * (1 - t / self.max_iter) + 1e-8
-            offspring = self._clip(X + sigma * np.random.randn(self.pop_size, self.dim))
+            offspring = self._clip(X + sigma * self.rng.standard_normal((self.pop_size, self.dim)))
             offspring_fit = np.array([self._eval(offspring[i]) for i in range(self.pop_size)])
 
             # Tournament selection from combined pool
@@ -29,7 +29,7 @@ class EP(_Base):
             q = 10
             wins = np.zeros(2 * self.pop_size, dtype=int)
             for i in range(2 * self.pop_size):
-                opponents = np.random.randint(0, 2 * self.pop_size, q)
+                opponents = self.rng.integers(0, 2 * self.pop_size, q)
                 wins[i] = np.sum(combined_fit[i] <= combined_fit[opponents])
 
             sorted_idx = np.argsort(-wins)[:self.pop_size]

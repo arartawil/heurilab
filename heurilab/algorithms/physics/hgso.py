@@ -20,7 +20,7 @@ class HGSO(_Base):
         best_fit = fitness[best_idx]
 
         # Assign gas types
-        types = np.random.randint(0, n_types, self.pop_size)
+        types = self.rng.integers(0, n_types, self.pop_size)
 
         convergence = [best_fit]
 
@@ -37,7 +37,7 @@ class HGSO(_Base):
                     cluster_best[c_type] = cb_idx
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
+                r1 = self.rng.random()
                 gamma = beta_h * np.exp(-best_fit / (fitness[i] + 1e-16))
 
                 if r1 > 0.5:
@@ -59,7 +59,7 @@ class HGSO(_Base):
             n_worst = max(1, int(0.1 * self.pop_size))
             worst_idx = np.argsort(fitness)[-n_worst:]
             for idx in worst_idx:
-                X[idx] = np.random.uniform(self.lb, self.ub, self.dim)
+                X[idx] = self.rng.uniform(self.lb, self.ub, self.dim)
                 fitness[idx] = self._eval(X[idx])
 
             min_idx = np.argmin(fitness)

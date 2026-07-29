@@ -27,11 +27,11 @@ class CA(_Base):
             for i in range(self.pop_size):
                 for j in range(self.dim):
                     if X[i, j] < bs_lb[j]:
-                        new_X[i, j] = X[i, j] + np.random.rand() * (bs_lb[j] - X[i, j])
+                        new_X[i, j] = X[i, j] + self.rng.random() * (bs_lb[j] - X[i, j])
                     elif X[i, j] > bs_ub[j]:
-                        new_X[i, j] = X[i, j] - np.random.rand() * (X[i, j] - bs_ub[j])
+                        new_X[i, j] = X[i, j] - self.rng.random() * (X[i, j] - bs_ub[j])
                     else:
-                        new_X[i, j] = X[i, j] + np.random.randn() * (bs_ub[j] - bs_lb[j]) * 0.1
+                        new_X[i, j] = X[i, j] + self.rng.standard_normal() * (bs_ub[j] - bs_lb[j]) * 0.1
 
                 new_X[i] = self._clip(new_X[i])
 

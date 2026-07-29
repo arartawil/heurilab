@@ -21,8 +21,8 @@ class TLBO(_Base):
             # ── Teacher Phase ──
             teacher = X[np.argmin(fitness)].copy()
             for i in range(self.pop_size):
-                TF = np.random.randint(1, 3)  # Teaching factor: 1 or 2
-                r = np.random.rand(self.dim)
+                TF = self.rng.integers(1, 3)  # Teaching factor: 1 or 2
+                r = self.rng.random(self.dim)
                 new_X = X[i] + r * (teacher - TF * mean_X)
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
@@ -32,11 +32,11 @@ class TLBO(_Base):
 
             # ── Learner Phase ──
             for i in range(self.pop_size):
-                j = np.random.randint(self.pop_size)
+                j = self.rng.integers(self.pop_size)
                 while j == i:
-                    j = np.random.randint(self.pop_size)
+                    j = self.rng.integers(self.pop_size)
 
-                r = np.random.rand(self.dim)
+                r = self.rng.random(self.dim)
                 if fitness[i] < fitness[j]:
                     new_X = X[i] + r * (X[i] - X[j])
                 else:

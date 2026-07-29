@@ -22,11 +22,11 @@ class DA(_Base):
         for t in range(self.max_iter):
             w = 0.9 - t * (0.9 - 0.4) / self.max_iter
             ratio = t / self.max_iter
-            s = 2 * np.random.rand() * (1 - ratio)  # Separation
-            a = 2 * np.random.rand() * ratio         # Alignment
-            c = 2 * np.random.rand() * ratio         # Cohesion
-            f = 2 * np.random.rand()                  # Food attraction
-            e = (1 - ratio) * np.random.rand()        # Enemy distraction
+            s = 2 * self.rng.random() * (1 - ratio)  # Separation
+            a = 2 * self.rng.random() * ratio         # Alignment
+            c = 2 * self.rng.random() * ratio         # Cohesion
+            f = 2 * self.rng.random()                  # Food attraction
+            e = (1 - ratio) * self.rng.random()        # Enemy distraction
 
             for i in range(self.pop_size):
                 # Find neighbours within radius
@@ -51,7 +51,7 @@ class DA(_Base):
                     X[i] = self._clip(X[i] + V[i])
                 else:
                     # Lévy flight for isolated dragonflies
-                    X[i] = self._clip(X[i] + np.random.randn(self.dim) * (self.ub - self.lb) * 0.01)
+                    X[i] = self._clip(X[i] + self.rng.standard_normal(self.dim) * (self.ub - self.lb) * 0.01)
 
                 fit = self._eval(X[i])
                 fitness[i] = fit

@@ -27,7 +27,7 @@ class FA(_Base):
                     if fitness[j] < fitness[i]:
                         r = np.linalg.norm(X[i] - X[j])
                         beta = beta0 * np.exp(-gamma * r ** 2)
-                        X[i] = X[i] + beta * (X[j] - X[i]) + alpha * (np.random.rand(self.dim) - 0.5)
+                        X[i] = X[i] + beta * (X[j] - X[i]) + alpha * (self.rng.random(self.dim) - 0.5)
                         X[i] = self._clip(X[i])
                         fitness[i] = self._eval(X[i])
 

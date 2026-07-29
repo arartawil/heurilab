@@ -18,37 +18,37 @@ class AVOA(_Base):
 
         for t in range(self.max_iter):
             # Starvation rate decreases linearly
-            F = 2 * np.random.rand() * (1 - t / self.max_iter) - (1 - t / self.max_iter)
+            F = 2 * self.rng.random() * (1 - t / self.max_iter) - (1 - t / self.max_iter)
             P1 = 0.6  # probability to select best vulture
             P2 = 0.4
             P3 = 0.6
 
             for i in range(self.pop_size):
                 # Select reference vulture
-                R_i = best1.copy() if np.random.rand() < P1 else best2.copy()
+                R_i = best1.copy() if self.rng.random() < P1 else best2.copy()
 
                 if abs(F) >= 1:
                     # Exploration phase
-                    if np.random.rand() < P2:
+                    if self.rng.random() < P2:
                         # Random exploration
-                        r1 = np.random.randint(self.pop_size)
+                        r1 = self.rng.integers(self.pop_size)
                         D = np.abs(R_i - X[r1])
                         X[i] = R_i - D * F
                     else:
                         # Levy flight exploration
-                        X[i] = R_i - F + np.random.rand(self.dim) * (self.ub - self.lb) * np.random.randn()
+                        X[i] = R_i - F + self.rng.random(self.dim) * (self.ub - self.lb) * self.rng.standard_normal()
                 else:
                     # Exploitation phase
                     if abs(F) >= 0.5:
-                        if np.random.rand() < P3:
+                        if self.rng.random() < P3:
                             # Rotating flight
                             D = np.abs(F * R_i - X[i])
-                            X[i] = D * np.cos(2 * np.pi * np.random.rand(self.dim)) - D * np.sin(2 * np.pi * np.random.rand(self.dim)) + R_i
+                            X[i] = D * np.cos(2 * np.pi * self.rng.random(self.dim)) - D * np.sin(2 * np.pi * self.rng.random(self.dim)) + R_i
                         else:
                             # Siege fight
                             d1 = R_i - X[i]
-                            S1 = R_i * (np.random.rand(self.dim) * d1 / (2 * np.pi)) * np.cos(d1)
-                            S2 = R_i * (np.random.rand(self.dim) * d1 / (2 * np.pi)) * np.sin(d1)
+                            S1 = R_i * (self.rng.random(self.dim) * d1 / (2 * np.pi)) * np.cos(d1)
+                            S2 = R_i * (self.rng.random(self.dim) * d1 / (2 * np.pi)) * np.sin(d1)
                             X[i] = R_i - (S1 + S2)
                     else:
                         # Aggressive competition

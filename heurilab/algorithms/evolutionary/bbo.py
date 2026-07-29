@@ -1,7 +1,7 @@
 """BBO — Biogeography-Based Optimization"""
 
 import numpy as np
-from heurilab.algorithms.base import _Base
+from heurilab.algorithms.base import _Base, roulette_probabilities
 
 
 class BBO(_Base):
@@ -28,14 +28,14 @@ class BBO(_Base):
             for i in range(self.pop_size):
                 for j in range(self.dim):
                     # Immigration
-                    if np.random.rand() < lambdas[i]:
-                        probs = mus / (np.sum(mus) + 1e-16)
-                        source = np.random.choice(self.pop_size, p=probs)
+                    if self.rng.random() < lambdas[i]:
+                        probs = roulette_probabilities(mus)
+                        source = self.rng.choice(self.pop_size, p=probs)
                         new_X[i, j] = X[source, j]
 
                     # Mutation
-                    if np.random.rand() < mutation_rate:
-                        new_X[i, j] = np.random.uniform(self.lb[j], self.ub[j])
+                    if self.rng.random() < mutation_rate:
+                        new_X[i, j] = self.rng.uniform(self.lb[j], self.ub[j])
 
             new_X = np.array([self._clip(new_X[i]) for i in range(self.pop_size)])
             new_fitness = np.array([self._eval(new_X[i]) for i in range(self.pop_size)])

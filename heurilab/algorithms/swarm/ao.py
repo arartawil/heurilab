@@ -1,5 +1,6 @@
 """AO — Aquila Optimizer (Abualigah et al., 2021)"""
 
+import math
 import numpy as np
 from heurilab.algorithms.base import _Base
 
@@ -24,29 +25,29 @@ class AO(_Base):
             mean_X = np.mean(X, axis=0)
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
+                r1 = self.rng.random()
 
                 if t1 <= 2 / 3:
                     if r1 < 0.5:
                         # X1: Expanded exploration (high soar with vertical stoop)
                         levy = self._levy_flight(self.dim)
-                        new_X = best * (1 - t1) + (mean_X - best * r1) * np.random.rand()
+                        new_X = best * (1 - t1) + (mean_X - best * r1) * self.rng.random()
                     else:
                         # X2: Narrowed exploration (contour flight with glide attack)
-                        theta = -np.pi + 2 * np.pi * np.random.rand()
-                        r_spiral = np.random.rand() * (self.ub - self.lb) * t1
+                        theta = -np.pi + 2 * np.pi * self.rng.random()
+                        r_spiral = self.rng.random() * (self.ub - self.lb) * t1
                         new_X = best - mean_X * alpha + r_spiral * np.cos(theta)
                 else:
                     if r1 < 0.5:
                         # X3: Expanded exploitation (low flight with gradual descent)
                         levy = self._levy_flight(self.dim)
                         QF = t1 ** 2  # Quality function
-                        new_X = (best - mean_X) * alpha - np.random.rand() + ((self.ub - self.lb) * np.random.rand() + self.lb) * delta
+                        new_X = (best - mean_X) * alpha - self.rng.random() + ((self.ub - self.lb) * self.rng.random() + self.lb) * delta
                     else:
                         # X4: Narrowed exploitation (walk and grab)
                         QF = t1 ** 2
                         levy = self._levy_flight(self.dim)
-                        new_X = QF * best - (G * np.random.rand() * X[i]) * np.abs(2 * np.random.rand() * best - X[i])
+                        new_X = QF * best - (G * self.rng.random() * X[i]) * np.abs(2 * self.rng.random() * best - X[i])
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
@@ -64,8 +65,8 @@ class AO(_Base):
         return best, best_fit, convergence
 
     def _levy_flight(self, dim, beta=1.5):
-        sigma_u = (np.math.gamma(1 + beta) * np.sin(np.pi * beta / 2) /
-                   (np.math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
-        u = np.random.randn(dim) * sigma_u
-        v = np.random.randn(dim)
+        sigma_u = (math.gamma(1 + beta) * np.sin(np.pi * beta / 2) /
+                   (math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
+        u = self.rng.standard_normal(dim) * sigma_u
+        v = self.rng.standard_normal(dim)
         return u / (np.abs(v) ** (1 / beta))

@@ -16,17 +16,17 @@ class SBOA(_Base):
         convergence = [best_fit]
 
         for t in range(self.max_iter):
-            RB = np.random.randn(self.dim)  # random Brownian
+            RB = self.rng.standard_normal(self.dim)  # random Brownian
             T_f = 1 - t / self.max_iter
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.5:
                     # Phase 1: Hunting (exploration)
                     # Secretary bird searches for prey (snakes)
-                    j = np.random.randint(self.pop_size)
-                    r1 = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    r1 = self.rng.random(self.dim)
 
                     # Attack strategy: stomp on prey
                     if fitness[j] < fitness[i]:
@@ -35,15 +35,15 @@ class SBOA(_Base):
                         new_X = X[i] + r1 * (X[i] - X[j]) * T_f
                 else:
                     # Phase 2: Escape from predators (exploitation)
-                    r1 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
 
-                    if np.random.rand() < 0.5:
+                    if self.rng.random() < 0.5:
                         # Flee toward best known safe position
-                        K = np.random.choice([1, 2])
+                        K = self.rng.choice([1, 2])
                         new_X = best + RB * (best - K * X[i]) * T_f
                     else:
                         # Evasive flight maneuver
-                        step = np.random.rand() * 2 * np.pi
+                        step = self.rng.random() * 2 * np.pi
                         new_X = X[i] + np.cos(step) * r1 * (best - X[i]) * T_f
 
                 new_X = self._clip(new_X)

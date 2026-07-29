@@ -26,11 +26,11 @@ class GJO(_Base):
             E1 = 1.5 * (1 - t / self.max_iter)  # Escaping energy
 
             for i in range(self.pop_size):
-                E0 = 2 * np.random.rand() - 1
+                E0 = 2 * self.rng.random() - 1
                 E = E1 * E0  # Escaping factor
 
-                r1 = np.random.rand(self.dim)
-                r2 = np.random.rand(self.dim)
+                r1 = self.rng.random(self.dim)
+                r2 = self.rng.random(self.dim)
 
                 if abs(E) >= 1:
                     # Exploration: search for prey

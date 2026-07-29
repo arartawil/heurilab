@@ -2,13 +2,13 @@
 Built-in metaheuristic algorithms — 100 algorithms in 6 categories.
 
 Swarm Intelligence:   PSO, GWO, WOA, MFO, SSA, HHO, MPA, BA, CS, FPA, DA, GOA,
-                      ALO, SHO, DO, EHO, AO, HGS, GTO, RUN
+                      ALO, SHO, EHO, AO, HGS, GTO, RUN
 Evolutionary:         GA, DE, ES, EP, CMA, BBO, SHADE, TLGO, CoDE, SaDE, OXDE,
                       AGDE, LSHADE, EBOwithCMAR, IMODE
 Physics-based:        GSA, MVO, SCA, AOA, SA, EO, WDO, HGSO, CSS, CFO, TWO, ASO,
                       RIME, AEO, GBO, TSO
-Human/Social:         TLBO, JA, HS, ICA, CA, BSO, SOS_H, QLA, INFO, HBO,
-                      AOArch, CHIO, SSOA, POA
+Human/Social:         TLBO, JA, HS, ICA, CA, BSO, INFO, HBO,
+                      AOArch, CHIO, SSOA, POA, ED
 Bio-inspired:         ABC, FA, SOS, BFO, CSA, BOA, TSA, WHO, SBO, MBO, EPO,
                       SMA, HBA, RSA, GJO
 Modern (2022–2025):   AVOA, DMO, MGO, DBO, COA, OOA, NOA, SAO, FLA, EVO,
@@ -19,7 +19,7 @@ from heurilab.algorithms.base import _Base
 
 from heurilab.algorithms.swarm import (PSO, GWO, WOA, MFO, SSA, HHO, MPA,
                                        BA, CS, FPA, DA, GOA,
-                                       ALO, SHO, DO, EHO,
+                                       ALO, SHO, EHO,
                                        AO, HGS, GTO, RUN)
 from heurilab.algorithms.evolutionary import (GA, DE, ES, EP, CMA, BBO, SHADE,
                                               TLGO, CoDE, SaDE, OXDE,
@@ -28,8 +28,8 @@ from heurilab.algorithms.physics import (GSA, MVO, SCA, AOA, SA, EO, WDO, HGSO,
                                          CSS, CFO, TWO, ASO,
                                          RIME, AEO, GBO, TSO)
 from heurilab.algorithms.human import (TLBO, JA, HS, ICA, CA, BSO,
-                                       SOS_H, QLA, INFO, HBO,
-                                       AOArch, CHIO, SSOA, POA)
+                                       INFO, HBO,
+                                       AOArch, CHIO, SSOA, POA, ED)
 from heurilab.algorithms.bio import (ABC, FA, SOS, BFO, CSA, BOA, TSA,
                                      WHO, SBO, MBO, EPO,
                                      SMA, HBA, RSA, GJO)
@@ -42,7 +42,7 @@ __all__ = [
     # Swarm Intelligence
     "PSO", "GWO", "WOA", "MFO", "SSA", "HHO", "MPA",
     "BA", "CS", "FPA", "DA", "GOA",
-    "ALO", "SHO", "DO", "EHO",
+    "ALO", "SHO", "EHO",
     "AO", "HGS", "GTO", "RUN",
     # Evolutionary
     "GA", "DE", "ES", "EP", "CMA", "BBO", "SHADE",
@@ -54,8 +54,8 @@ __all__ = [
     "RIME", "AEO", "GBO", "TSO",
     # Human/Social
     "TLBO", "JA", "HS", "ICA", "CA", "BSO",
-    "SOS_H", "QLA", "INFO", "HBO",
-    "AOArch", "CHIO", "SSOA", "POA",
+    "INFO", "HBO",
+    "AOArch", "CHIO", "SSOA", "POA", "ED",
     # Bio-inspired
     "ABC", "FA", "SOS", "BFO", "CSA", "BOA", "TSA",
     "WHO", "SBO", "MBO", "EPO",
@@ -71,7 +71,7 @@ SWARM_ALGORITHMS = [
     ("PSO", PSO), ("GWO", GWO), ("WOA", WOA), ("MFO", MFO),
     ("SSA", SSA), ("HHO", HHO), ("MPA", MPA),
     ("BA", BA), ("CS", CS), ("FPA", FPA), ("DA", DA), ("GOA", GOA),
-    ("ALO", ALO), ("SHO", SHO), ("DO", DO), ("EHO", EHO),
+    ("ALO", ALO), ("SHO", SHO), ("EHO", EHO),
     ("AO", AO), ("HGS", HGS), ("GTO", GTO), ("RUN", RUN),
 ]
 
@@ -92,8 +92,8 @@ PHYSICS_ALGORITHMS = [
 HUMAN_ALGORITHMS = [
     ("TLBO", TLBO), ("JA", JA),
     ("HS", HS), ("ICA", ICA), ("CA", CA), ("BSO", BSO),
-    ("SOS_H", SOS_H), ("QLA", QLA), ("INFO", INFO), ("HBO", HBO),
-    ("AOArch", AOArch), ("CHIO", CHIO), ("SSOA", SSOA), ("POA", POA),
+    ("INFO", INFO), ("HBO", HBO),
+    ("AOArch", AOArch), ("CHIO", CHIO), ("SSOA", SSOA), ("POA", POA), ("ED", ED),
 ]
 
 BIO_ALGORITHMS = [

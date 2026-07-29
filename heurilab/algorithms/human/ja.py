@@ -20,8 +20,8 @@ class JA(_Base):
             worst = X[worst_idx].copy()
 
             for i in range(self.pop_size):
-                r1 = np.random.rand(self.dim)
-                r2 = np.random.rand(self.dim)
+                r1 = self.rng.random(self.dim)
+                r2 = self.rng.random(self.dim)
                 new_X = X[i] + r1 * (best - np.abs(X[i])) - r2 * (worst - np.abs(X[i]))
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

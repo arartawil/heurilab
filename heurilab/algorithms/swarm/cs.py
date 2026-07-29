@@ -1,5 +1,6 @@
 """CS — Cuckoo Search"""
 
+import math
 import numpy as np
 from heurilab.algorithms.base import _Base
 
@@ -20,20 +21,20 @@ class CS(_Base):
 
         # Precompute Lévy constants
         sigma_u = (
-            np.math.gamma(1 + beta) * np.sin(np.pi * beta / 2)
-            / (np.math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))
+            math.gamma(1 + beta) * np.sin(np.pi * beta / 2)
+            / (math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))
         ) ** (1 / beta)
 
         for t in range(self.max_iter):
             for i in range(self.pop_size):
-                u = np.random.randn(self.dim) * sigma_u
-                v = np.random.randn(self.dim)
+                u = self.rng.standard_normal(self.dim) * sigma_u
+                v = self.rng.standard_normal(self.dim)
                 step = u / (np.abs(v) ** (1 / beta))
 
                 new_X = self._clip(X[i] + 0.01 * step * (X[i] - best))
                 new_fit = self._eval(new_X)
 
-                j = np.random.randint(self.pop_size)
+                j = self.rng.integers(self.pop_size)
                 if new_fit < fitness[j]:
                     X[j] = new_X
                     fitness[j] = new_fit
@@ -42,8 +43,8 @@ class CS(_Base):
             n_abandon = int(pa * self.pop_size)
             worst_idx = np.argsort(fitness)[-n_abandon:]
             for idx in worst_idx:
-                r1, r2 = np.random.randint(0, self.pop_size, 2)
-                step_size = np.random.rand() * (X[r1] - X[r2])
+                r1, r2 = self.rng.integers(0, self.pop_size, 2)
+                step_size = self.rng.random() * (X[r1] - X[r2])
                 X[idx] = self._clip(X[idx] + step_size)
                 fitness[idx] = self._eval(X[idx])
 

@@ -30,30 +30,30 @@ class EBOwithCMAR(_Base):
             p_exploit = 0.5 * (1 + t / self.max_iter)
 
             for i in range(self.pop_size):
-                ri = np.random.randint(H)
-                CR_i = np.clip(np.random.normal(M_CR[ri], 0.1), 0, 1)
-                F_i = min(1.0, max(0.01, M_F[ri] + 0.1 * np.random.standard_cauchy()))
+                ri = self.rng.integers(H)
+                CR_i = np.clip(self.rng.normal(M_CR[ri], 0.1), 0, 1)
+                F_i = min(1.0, max(0.01, M_F[ri] + 0.1 * self.rng.standard_cauchy()))
 
-                if np.random.rand() < p_exploit:
+                if self.rng.random() < p_exploit:
                     # CMA-based perturbation
                     try:
-                        z = np.random.multivariate_normal(np.zeros(self.dim), C)
+                        z = self.rng.multivariate_normal(np.zeros(self.dim), C)
                     except np.linalg.LinAlgError:
-                        z = np.random.randn(self.dim) * 0.1
+                        z = self.rng.standard_normal(self.dim) * 0.1
                     mutant = best + F_i * z
                 else:
                     # DE/current-to-best/1
                     idxs = list(range(self.pop_size))
                     idxs.remove(i)
-                    r1, r2 = np.random.choice(idxs, 2, replace=False)
+                    r1, r2 = self.rng.choice(idxs, 2, replace=False)
                     mutant = X[i] + F_i * (best - X[i]) + F_i * (X[r1] - X[r2])
 
                 mutant = self._clip(mutant)
 
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR_i or j == j_rand:
+                    if self.rng.random() < CR_i or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

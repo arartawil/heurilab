@@ -32,25 +32,25 @@ class MBO(_Base):
             # ── Migration operator (Land 1 butterflies) ──
             for i in land1_idx:
                 for j in range(self.dim):
-                    r1 = np.random.rand() * peri
+                    r1 = self.rng.random() * peri
                     if r1 <= p_mbo:
-                        r_idx = np.random.choice(land1_idx)
+                        r_idx = self.rng.choice(land1_idx)
                         new_X[i, j] = X[r_idx, j]
                     else:
-                        r_idx = np.random.choice(land2_idx) if len(land2_idx) > 0 else np.random.choice(land1_idx)
+                        r_idx = self.rng.choice(land2_idx) if len(land2_idx) > 0 else self.rng.choice(land1_idx)
                         new_X[i, j] = X[r_idx, j]
 
             # ── Butterfly adjusting operator (Land 2 butterflies) ──
             for i in land2_idx:
                 scale = (self.ub - self.lb) / (t + 1) ** 2
                 for j in range(self.dim):
-                    if np.random.rand() >= BAR:
+                    if self.rng.random() >= BAR:
                         new_X[i, j] = best[j]
                     else:
-                        r_idx = np.random.choice(land2_idx) if len(land2_idx) > 1 else np.random.choice(self.pop_size)
+                        r_idx = self.rng.choice(land2_idx) if len(land2_idx) > 1 else self.rng.choice(self.pop_size)
                         new_X[i, j] = X[r_idx, j]
-                        if np.random.rand() > BAR:
-                            new_X[i, j] += scale[j] * (2 * np.random.rand() - 1)
+                        if self.rng.random() > BAR:
+                            new_X[i, j] += scale[j] * (2 * self.rng.random() - 1)
 
             new_X = np.array([self._clip(new_X[i]) for i in range(self.pop_size)])
             new_fitness = np.array([self._eval(new_X[i]) for i in range(self.pop_size)])

@@ -24,17 +24,17 @@ class BA(_Base):
 
         for t in range(self.max_iter):
             for i in range(self.pop_size):
-                freq = f_min + (f_max - f_min) * np.random.rand()
+                freq = f_min + (f_max - f_min) * self.rng.random()
                 V[i] += (X[i] - best) * freq
                 new_X = self._clip(X[i] + V[i])
 
                 # Local search
-                if np.random.rand() > r[i]:
-                    new_X = self._clip(best + 0.01 * np.random.randn(self.dim) * np.mean(A))
+                if self.rng.random() > r[i]:
+                    new_X = self._clip(best + 0.01 * self.rng.standard_normal(self.dim) * np.mean(A))
 
                 new_fit = self._eval(new_X)
 
-                if new_fit < fitness[i] and np.random.rand() < A[i]:
+                if new_fit < fitness[i] and self.rng.random() < A[i]:
                     X[i] = new_X
                     fitness[i] = new_fit
                     A[i] *= alpha

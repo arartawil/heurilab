@@ -28,35 +28,35 @@ class DBO(_Base):
 
             # Ball-rolling dung beetles (exploration)
             for i in range(n1):
-                alpha = np.random.rand()
-                k = 0.1 * np.random.randn()
+                alpha = self.rng.random()
+                k = 0.1 * self.rng.standard_normal()
                 delta = np.abs(X[i] - worst)
-                if np.random.rand() < 0.9:
+                if self.rng.random() < 0.9:
                     X[i] = X[i] + alpha * delta + k * (X[i] - best)
                 else:
-                    X[i] = X[i] + np.tan(np.random.rand() * np.pi / 6) * np.abs(X[i] - best)
+                    X[i] = X[i] + np.tan(self.rng.random() * np.pi / 6) * np.abs(X[i] - best)
                 X[i] = self._clip(X[i])
 
             # Breeding dung beetles (exploitation near best)
             for i in range(n1, n1 + n2):
-                R = np.random.rand(self.dim)
+                R = self.rng.random(self.dim)
                 b1 = best * (1 - r)
                 b2 = best * (1 + r)
                 lb_local = np.maximum(self.lb, b1)
                 ub_local = np.minimum(self.ub, b2)
-                X[i] = best + R * (lb_local + np.random.rand(self.dim) * (ub_local - lb_local) - X[i])
+                X[i] = best + R * (lb_local + self.rng.random(self.dim) * (ub_local - lb_local) - X[i])
                 X[i] = self._clip(X[i])
 
             # Small dung beetles (foraging)
             for i in range(n1 + n2, n1 + n2 + n3):
-                C1 = np.random.rand(self.dim) * X[i]
-                C2 = X[i] + np.random.randn(self.dim) * (X[i] - best) * r
-                X[i] = X[i] + C1 * np.random.randn() + C2 * np.random.randn()
+                C1 = self.rng.random(self.dim) * X[i]
+                C2 = X[i] + self.rng.standard_normal(self.dim) * (X[i] - best) * r
+                X[i] = X[i] + C1 * self.rng.standard_normal() + C2 * self.rng.standard_normal()
                 X[i] = self._clip(X[i])
 
             # Thief dung beetles (stealing)
             for i in range(n1 + n2 + n3, self.pop_size):
-                g = np.random.randn(self.dim)
+                g = self.rng.standard_normal(self.dim)
                 X[i] = best + g * (np.abs(X[i] - best) + np.abs(X[i] - worst)) / 2
                 X[i] = self._clip(X[i])
 

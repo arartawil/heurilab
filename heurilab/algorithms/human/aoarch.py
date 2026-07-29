@@ -18,8 +18,8 @@ class AOArch(_Base):
         ub = np.array(self.ub)
 
         # Density and volume
-        den = np.random.rand(self.pop_size)
-        vol = np.random.rand(self.pop_size)
+        den = self.rng.random(self.pop_size)
+        vol = self.rng.random(self.pop_size)
 
         for t in range(self.max_iter):
             TF = np.exp((t - self.max_iter) / self.max_iter)  # Transfer factor
@@ -30,19 +30,19 @@ class AOArch(_Base):
 
             for i in range(self.pop_size):
                 # Update density and volume
-                r_idx = np.random.randint(self.pop_size)
-                den_new[i] = den[i] + np.random.rand() * (den[r_idx] - den[i])
-                vol_new[i] = vol[i] + np.random.rand() * (vol[r_idx] - vol[i])
+                r_idx = self.rng.integers(self.pop_size)
+                den_new[i] = den[i] + self.rng.random() * (den[r_idx] - den[i])
+                vol_new[i] = vol[i] + self.rng.random() * (vol[r_idx] - vol[i])
 
                 if TF <= 0.5:
                     # Exploration phase
-                    r1 = np.random.randint(self.pop_size)
-                    new_X = X[i] + np.random.rand(self.dim) * (X[r1] - X[i]) * d_flag
+                    r1 = self.rng.integers(self.pop_size)
+                    new_X = X[i] + self.rng.random(self.dim) * (X[r1] - X[i]) * d_flag
                 else:
                     # Exploitation phase
-                    acc = (den_new[best_idx] + vol_new[best_idx] * np.random.rand(self.dim)) / \
+                    acc = (den_new[best_idx] + vol_new[best_idx] * self.rng.random(self.dim)) / \
                           (den_new[i] * vol_new[i] + 1e-16)
-                    f = 2 * np.random.rand() - 1  # direction flag
+                    f = 2 * self.rng.random() - 1  # direction flag
                     new_X = best + f * TF * acc * (best - X[i])
 
                 new_X = self._clip(new_X)

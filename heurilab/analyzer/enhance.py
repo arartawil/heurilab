@@ -91,6 +91,28 @@ def _calc_diversity(positions_per_gen: List[np.ndarray]) -> List[float]:
     return diversities
 
 
+def _exploration_percentage(diversities: List[float]) -> float:
+    """Mean exploration percentage over a run, after Hussain et al. (2019).
+
+    ``XPL%(t) = Div(t) / Div_max * 100``, averaged over the run. Because
+    ``Div_max`` is almost always the initial diversity, this is the area under
+    the normalised diversity curve: how much of its starting spread the
+    population retained.
+
+    Measuring *maintenance* rather than initial diversity is the whole point.
+    Initial diversity is produced by ``_Base._init_pop()`` and is therefore
+    identical for every algorithm in the library -- scoring it measures the base
+    class, not the optimizer.
+    """
+    div = np.asarray([d for d in diversities if np.isfinite(d)], dtype=float)
+    if div.size < 2:
+        return 0.0
+    div_max = float(div.max())
+    if div_max <= 0.0:
+        return 0.0
+    return float(np.clip(np.mean(div / div_max) * 100.0, 0.0, 100.0))
+
+
 def _detect_stagnation(convergence: list, window: int = 10) -> int:
     """Return the iteration where stagnation begins (no improvement for `window` iters)."""
     conv = np.array(convergence)
@@ -154,9 +176,10 @@ ENHANCEMENTS = [
             "ideal for escaping local optima on multimodal landscapes."
         ),
         "code": (
+            "import math\n"
             "def levy_flight(dim, beta=1.5):\n"
-            "    sigma_u = (np.math.gamma(1+beta)*np.sin(np.pi*beta/2) /\n"
-            "              (np.math.gamma((1+beta)/2)*beta*2**((beta-1)/2)))**(1/beta)\n"
+            "    sigma_u = (math.gamma(1+beta)*np.sin(np.pi*beta/2) /\n"
+            "              (math.gamma((1+beta)/2)*beta*2**((beta-1)/2)))**(1/beta)\n"
             "    u = np.random.randn(dim) * sigma_u\n"
             "    v = np.random.randn(dim)\n"
             "    return u / (np.abs(v) ** (1/beta))\n"
@@ -397,14 +420,10 @@ def _compute_scores(all_results: Dict[str, dict]) -> dict:
     mean_fit = np.mean(uni["fitnesses"])
     scores["exploitation"] = float(np.clip(100 - np.log10(mean_fit + 1e-30) * 8, 0, 100))
 
-    # --- Exploration: initial diversity maintenance ---
-    divs = []
-    for d_list in uni["diversities"]:
-        if len(d_list) >= 2:
-            divs.append(d_list[0])
-    init_div = np.mean(divs) if divs else 0
-    # Normalize: high diversity = good exploration
-    scores["exploration"] = float(np.clip(init_div / 30 * 100, 0, 100))
+    # --- Exploration: how much of its initial spread the population retained ---
+    xpl = [_exploration_percentage(d_list) for d_list in uni["diversities"]
+           if len(d_list) >= 2]
+    scores["exploration"] = float(np.mean(xpl)) if xpl else 0.0
 
     # --- Local optima escape: multimodal vs unimodal ratio ---
     multi = all_results["multimodal"]
@@ -811,14 +830,13 @@ def _compute_custom_scores(all_results: dict, tests: dict) -> dict:
     # --- Exploitation: average quality on all functions ---
     scores["exploitation"] = float(np.mean(func_scores))
 
-    # --- Exploration: average initial diversity across tests ---
-    divs = []
+    # --- Exploration: diversity retained, averaged across tests ---
+    xpl = []
     for key in keys:
         for d_list in all_results[key]["diversities"]:
             if len(d_list) >= 2:
-                divs.append(d_list[0])
-    init_div = np.mean(divs) if divs else 0
-    scores["exploration"] = float(np.clip(init_div / 30 * 100, 0, 100))
+                xpl.append(_exploration_percentage(d_list))
+    scores["exploration"] = float(np.mean(xpl)) if xpl else 0.0
 
     # --- Convergence speed: average across all tests ---
     speeds = []

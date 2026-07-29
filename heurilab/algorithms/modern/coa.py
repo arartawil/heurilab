@@ -20,11 +20,11 @@ class COA(_Base):
 
             # Phase 1: Hunting strategy (iguana hunting) — first half
             for i in range(half):
-                r = np.random.rand(self.dim)
-                I = np.random.choice([1, 2])
+                r = self.rng.random(self.dim)
+                I = self.rng.choice([1, 2])
 
                 # Iguana position (random in tree = upper search space)
-                iguana = self.lb + np.random.rand(self.dim) * (self.ub - self.lb)
+                iguana = self.lb + self.rng.random(self.dim) * (self.ub - self.lb)
                 iguana_fit = self._eval(iguana)
 
                 if iguana_fit < fitness[i]:
@@ -40,7 +40,7 @@ class COA(_Base):
 
             # Phase 2: Escaping predators — second half
             for i in range(half, self.pop_size):
-                r = np.random.rand(self.dim)
+                r = self.rng.random(self.dim)
                 # Coati escaping to safe area near the best
                 new_X = X[i] + (1 - 2 * r) * (best - I * X[i]) * (1 - t / self.max_iter)
 

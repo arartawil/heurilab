@@ -43,7 +43,7 @@ class TWO(_Base):
                         direction = X[j] - X[i]
                         r = np.linalg.norm(direction) + eps
                         tension = weight[j] / (r + eps)
-                        force += np.random.rand() * tension * direction / r
+                        force += self.rng.random() * tension * direction / r
 
                 # Acceleration = Force / mass
                 accel = force / (weight[i] + eps)

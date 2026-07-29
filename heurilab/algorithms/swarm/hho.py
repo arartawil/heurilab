@@ -16,19 +16,19 @@ class HHO(_Base):
         convergence = [rabbit_fit]
 
         for t in range(self.max_iter):
-            E0 = 2 * np.random.rand() - 1
+            E0 = 2 * self.rng.random() - 1
             J_factor = 2 * (1 - t / self.max_iter)
             E = E0 * J_factor
 
             for i in range(self.pop_size):
-                q = np.random.rand()
+                q = self.rng.random()
 
                 if abs(E) >= 1:  # Exploration
                     if q >= 0.5:
-                        rand_idx = np.random.randint(self.pop_size)
-                        X[i] = X[rand_idx] - np.random.rand(self.dim) * np.abs(X[rand_idx] - 2 * np.random.rand(self.dim) * X[i])
+                        rand_idx = self.rng.integers(self.pop_size)
+                        X[i] = X[rand_idx] - self.rng.random(self.dim) * np.abs(X[rand_idx] - 2 * self.rng.random(self.dim) * X[i])
                     else:
-                        X[i] = rabbit - np.mean(X, axis=0) - np.random.rand(self.dim) * (self.ub - self.lb) * np.random.rand() + self.lb
+                        X[i] = rabbit - np.mean(X, axis=0) - self.rng.random(self.dim) * (self.ub - self.lb) * self.rng.random() + self.lb
                 else:  # Exploitation
                     if q >= 0.5 and abs(E) >= 0.5:
                         D = np.abs(rabbit - X[i])
@@ -37,17 +37,17 @@ class HHO(_Base):
                         D = np.abs(rabbit - X[i])
                         X[i] = rabbit - E * D
                     elif q < 0.5 and abs(E) >= 0.5:
-                        J = 2 * (1 - np.random.rand())
+                        J = 2 * (1 - self.rng.random())
                         Y = rabbit - E * np.abs(J * rabbit - X[i])
                         fit_Y = self._eval(self._clip(Y))
-                        S = Y + np.random.randn(self.dim) * (self.ub - self.lb) * 0.01
+                        S = Y + self.rng.standard_normal(self.dim) * (self.ub - self.lb) * 0.01
                         fit_S = self._eval(self._clip(S))
                         X[i] = Y if fit_Y < fit_S else S
                     else:
-                        J = 2 * (1 - np.random.rand())
+                        J = 2 * (1 - self.rng.random())
                         Y = rabbit - E * np.abs(J * rabbit - np.mean(X, axis=0))
                         fit_Y = self._eval(self._clip(Y))
-                        S = Y + np.random.randn(self.dim) * (self.ub - self.lb) * 0.01
+                        S = Y + self.rng.standard_normal(self.dim) * (self.ub - self.lb) * 0.01
                         fit_S = self._eval(self._clip(S))
                         X[i] = Y if fit_Y < fit_S else S
 

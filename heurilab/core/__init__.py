@@ -24,6 +24,14 @@ from heurilab.core.cec2017 import (
     get_cec2017_multimodal_suite, get_cec2017_hybrid_suite,
     get_cec2017_composition_suite,
 )
+from heurilab.core.cec2020 import (
+    CEC20_F1, CEC20_F2, CEC20_F3, CEC20_F4, CEC20_F5,
+    CEC20_F6, CEC20_F7, CEC20_F8, CEC20_F9, CEC20_F10,
+    CEC2020_FUNCTIONS,
+    get_cec2020_suite, get_cec2020_unimodal_suite,
+    get_cec2020_multimodal_suite, get_cec2020_hybrid_suite,
+    get_cec2020_composition_suite,
+)
 
 __all__ = [
     "BenchmarkConfig", "BenchmarkSuite", "run_experiment",
@@ -46,4 +54,11 @@ __all__ = [
     "get_cec2017_suite", "get_cec2017_unimodal_suite",
     "get_cec2017_multimodal_suite", "get_cec2017_hybrid_suite",
     "get_cec2017_composition_suite",
+    # CEC 2020
+    "CEC20_F1", "CEC20_F2", "CEC20_F3", "CEC20_F4", "CEC20_F5",
+    "CEC20_F6", "CEC20_F7", "CEC20_F8", "CEC20_F9", "CEC20_F10",
+    "CEC2020_FUNCTIONS",
+    "get_cec2020_suite", "get_cec2020_unimodal_suite",
+    "get_cec2020_multimodal_suite", "get_cec2020_hybrid_suite",
+    "get_cec2020_composition_suite",
 ]

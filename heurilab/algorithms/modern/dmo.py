@@ -30,7 +30,7 @@ class DMO(_Base):
 
             # Alpha group — foraging near the best
             for idx in sorted_idx[:n_alpha]:
-                new_X = X[idx] + C * peep * np.random.randn(self.dim) * (best - X[idx])
+                new_X = X[idx] + C * peep * self.rng.standard_normal(self.dim) * (best - X[idx])
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
                 if new_fit < fitness[idx]:
@@ -42,13 +42,13 @@ class DMO(_Base):
 
             # Scout group — exploration
             for idx in sorted_idx[n_alpha:n_alpha + n_scout]:
-                if np.random.rand() < phi:
+                if self.rng.random() < phi:
                     # Exploration near random member
-                    r = np.random.randint(self.pop_size)
-                    new_X = X[idx] + C * np.random.randn(self.dim) * (X[r] - X[idx])
+                    r = self.rng.integers(self.pop_size)
+                    new_X = X[idx] + C * self.rng.standard_normal(self.dim) * (X[r] - X[idx])
                 else:
                     # Random exploration
-                    new_X = self.lb + np.random.rand(self.dim) * (self.ub - self.lb)
+                    new_X = self.lb + self.rng.random(self.dim) * (self.ub - self.lb)
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
@@ -63,11 +63,11 @@ class DMO(_Base):
             for idx in sorted_idx[n_alpha + n_scout:]:
                 if tau[idx] > 3:
                     # Exchange sleeping mound
-                    X[idx] = self.lb + np.random.rand(self.dim) * (self.ub - self.lb)
+                    X[idx] = self.lb + self.rng.random(self.dim) * (self.ub - self.lb)
                     fitness[idx] = self._eval(X[idx])
                     tau[idx] = 0
                 else:
-                    new_X = X[idx] + C * np.random.randn(self.dim) * (best - X[idx]) * phi
+                    new_X = X[idx] + C * self.rng.standard_normal(self.dim) * (best - X[idx]) * phi
                     new_X = self._clip(new_X)
                     new_fit = self._eval(new_X)
                     if new_fit < fitness[idx]:

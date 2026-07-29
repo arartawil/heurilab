@@ -30,21 +30,21 @@ class SMA(_Base):
             worst_fit = fitness[sorted_idx[-1]]
             for i, si in enumerate(sorted_idx):
                 if i < half:
-                    W[si] = 1 + np.random.rand() * np.log10((best_fit - fitness[si]) / (worst_fit - best_fit + 1e-16) + 1)
+                    W[si] = 1 + self.rng.random() * np.log10((best_fit - fitness[si]) / (best_fit - worst_fit - 1e-16) + 1)
                 else:
-                    W[si] = 1 - np.random.rand() * np.log10((best_fit - fitness[si]) / (worst_fit - best_fit + 1e-16) + 1)
+                    W[si] = 1 - self.rng.random() * np.log10((best_fit - fitness[si]) / (best_fit - worst_fit - 1e-16) + 1)
 
             for i in range(self.pop_size):
-                if np.random.rand() < z:
+                if self.rng.random() < z:
                     # Random exploration
-                    new_X = lb + np.random.rand(self.dim) * (ub - lb)
+                    new_X = lb + self.rng.random(self.dim) * (ub - lb)
                 else:
                     p = np.tanh(abs(fitness[i] - best_fit))
-                    vb = a * (2 * np.random.rand(self.dim) - 1)
-                    vc = b * (2 * np.random.rand(self.dim) - 1)
+                    vb = a * (2 * self.rng.random(self.dim) - 1)
+                    vc = b * (2 * self.rng.random(self.dim) - 1)
 
-                    r = np.random.rand()
-                    rA, rB = np.random.randint(self.pop_size, size=2)
+                    r = self.rng.random()
+                    rA, rB = self.rng.integers(self.pop_size, size=2)
 
                     if r < p:
                         new_X = best + vb * (W[i] * X[rA] - X[rB])

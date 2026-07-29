@@ -19,7 +19,7 @@ class CHIO(_Base):
         status = np.zeros(self.pop_size, dtype=int)
         # Initially infect some
         n_infected = max(1, self.pop_size // 5)
-        infected_idx = np.random.choice(self.pop_size, n_infected, replace=False)
+        infected_idx = self.rng.choice(self.pop_size, n_infected, replace=False)
         status[infected_idx] = 1
 
         HI_rate = 0.7  # herd immunity rate
@@ -35,8 +35,8 @@ class CHIO(_Base):
                 new_X = X[i].copy()
 
                 for j in range(self.dim):
-                    r = np.random.rand()
-                    r_idx = np.random.randint(self.pop_size)
+                    r = self.rng.random()
+                    r_idx = self.rng.integers(self.pop_size)
 
                     if status[r_idx] == 1:  # infected neighbor
                         new_X[j] = X[i][j] + r * (X[i][j] - X[r_idx][j])
@@ -53,7 +53,7 @@ class CHIO(_Base):
                     fitness[i] = new_fit
                     status[i] = 2  # recovered/immune
                 else:
-                    if np.random.rand() < spreading_rate:
+                    if self.rng.random() < spreading_rate:
                         status[i] = 1  # becomes infected
 
             # Check herd immunity
@@ -62,7 +62,7 @@ class CHIO(_Base):
                 # Reset some immune to susceptible
                 immune_idxs = np.where(status == 2)[0]
                 n_reset = max(1, len(immune_idxs) // 3)
-                reset_idxs = np.random.choice(immune_idxs, n_reset, replace=False)
+                reset_idxs = self.rng.choice(immune_idxs, n_reset, replace=False)
                 status[reset_idxs] = 0
 
             min_idx = np.argmin(fitness)

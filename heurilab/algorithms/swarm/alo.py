@@ -25,17 +25,17 @@ class ALO(_Base):
                 # Select antlion via roulette wheel
                 probs = 1.0 / (al_fitness - np.min(al_fitness) + 1e-16)
                 probs = probs / np.sum(probs)
-                al_idx = np.random.choice(self.pop_size, p=probs)
+                al_idx = self.rng.choice(self.pop_size, p=probs)
 
                 # Random walks around selected antlion and elite
-                lb_al = antlions[al_idx] / I
-                ub_al = antlions[al_idx] + (self.ub - self.lb) / I
+                lb_al = antlions[al_idx] + self.lb / I
+                ub_al = antlions[al_idx] + self.ub / I
 
-                lb_el = elite / I
-                ub_el = elite + (self.ub - self.lb) / I
+                lb_el = elite + self.lb / I
+                ub_el = elite + self.ub / I
 
-                rw_al = np.random.uniform(lb_al, ub_al, self.dim)
-                rw_el = np.random.uniform(lb_el, ub_el, self.dim)
+                rw_al = self.rng.uniform(lb_al, ub_al, self.dim)
+                rw_el = self.rng.uniform(lb_el, ub_el, self.dim)
 
                 X[i] = self._clip((rw_al + rw_el) / 2.0)
 

@@ -32,23 +32,23 @@ class HGS(_Base):
             shrink = 2 * (1 - t / self.max_iter)  # Shrinking factor
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
-                r2 = np.random.rand()
+                r1 = self.rng.random()
+                r2 = self.rng.random()
 
-                W1 = hunger[i] * np.random.rand(self.dim)
+                W1 = hunger[i] * self.rng.random(self.dim)
 
                 if r1 < PUP:
                     # Random approach
-                    new_X = X[i] * (1 + np.random.randn(self.dim))
+                    new_X = X[i] * (1 + self.rng.standard_normal(self.dim))
                 elif r2 > 0.5:
                     # Approach to best weighted by hunger
-                    r3 = np.random.rand(self.dim)
+                    r3 = self.rng.random(self.dim)
                     A = shrink * (2 * r3 - 1)
                     new_X = best + A * np.abs(best - X[i]) * W1
                 else:
                     # Social interaction
-                    j = np.random.randint(self.pop_size)
-                    r4 = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    r4 = self.rng.random(self.dim)
                     A = shrink * (2 * r4 - 1)
                     if fitness[j] < fitness[i]:
                         new_X = X[i] + A * np.abs(X[j] - X[i]) * W1

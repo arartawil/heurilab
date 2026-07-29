@@ -24,11 +24,11 @@ class SA(_Base):
 
             for i in range(self.pop_size):
                 # Generate neighbour
-                new_X = self._clip(X[i] + np.random.randn(self.dim) * (self.ub - self.lb) * T / T0)
+                new_X = self._clip(X[i] + self.rng.standard_normal(self.dim) * (self.ub - self.lb) * T / T0)
                 new_fit = self._eval(new_X)
 
                 delta = new_fit - fitness[i]
-                if delta < 0 or np.random.rand() < np.exp(-delta / (T + 1e-16)):
+                if delta < 0 or self.rng.random() < np.exp(-delta / (T + 1e-16)):
                     X[i] = new_X
                     fitness[i] = new_fit
 

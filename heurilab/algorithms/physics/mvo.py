@@ -26,15 +26,15 @@ class MVO(_Base):
 
             for i in range(self.pop_size):
                 for j in range(self.dim):
-                    r1 = np.random.rand()
+                    r1 = self.rng.random()
                     if r1 < norm_fit[i]:
                         # White hole: select random universe by roulette
-                        white_idx = sorted_idx[np.random.randint(self.pop_size)]
+                        white_idx = sorted_idx[self.rng.integers(self.pop_size)]
                         X[i, j] = X[white_idx, j]
 
-                    r2 = np.random.rand()
+                    r2 = self.rng.random()
                     if r2 < WEP:
-                        r3, r4 = np.random.rand(), np.random.rand()
+                        r3, r4 = self.rng.random(), self.rng.random()
                         if r3 < 0.5:
                             X[i, j] = best[j] + TDR * ((self.ub[j] - self.lb[j]) * r4 + self.lb[j])
                         else:

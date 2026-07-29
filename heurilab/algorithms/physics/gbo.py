@@ -25,23 +25,23 @@ class GBO(_Base):
             alpha = abs(beta * np.sin(3 * np.pi / 2 + np.sin(beta * 3 * np.pi / 2)))
 
             for i in range(self.pop_size):
-                r1, r2 = np.random.rand(2)
+                r1, r2 = self.rng.random(2)
                 eps = 5e-3 * t / self.max_iter
 
                 # Gradient Search Rule (GSR)
-                delta = 2 * r1 * (abs(np.random.rand() * best - X[i]) / (best - worst + 1e-16))
-                step = (best - X[np.random.randint(self.pop_size)]) * r2
+                delta = 2 * r1 * (abs(self.rng.random() * best - X[i]) / (best - worst + 1e-16))
+                step = (best - X[self.rng.integers(self.pop_size)]) * r2
 
                 # Direction of Movement (DM)
                 GSR = alpha * delta * step
 
                 # Local escaping operator
-                if np.random.rand() < pr:
-                    r3 = np.random.randint(self.pop_size)
-                    r4 = np.random.randint(self.pop_size)
-                    new_X = X[i] - GSR + np.random.rand() * (X[r3] - X[r4])
+                if self.rng.random() < pr:
+                    r3 = self.rng.integers(self.pop_size)
+                    r4 = self.rng.integers(self.pop_size)
+                    new_X = X[i] - GSR + self.rng.random() * (X[r3] - X[r4])
                 else:
-                    rnd = np.random.rand(self.dim)
+                    rnd = self.rng.random(self.dim)
                     new_X = best - GSR + rnd * (best - X[i])
 
                 new_X = self._clip(new_X)

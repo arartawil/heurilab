@@ -29,18 +29,18 @@ class GMO(_Base):
             geo_mean = geo_mean * sign_vote
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.5:
                     # Phase 1: Geometric mean attraction (exploitation)
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand(self.dim)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random(self.dim)
                     new_X = X[i] + r1 * (geo_mean - X[i]) + r2 * a * (best - X[i])
                 else:
                     # Phase 2: Exploration using GM-based perturbation
-                    j = np.random.randint(self.pop_size)
-                    k = np.random.randint(self.pop_size)
-                    r1 = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    k = self.rng.integers(self.pop_size)
+                    r1 = self.rng.random(self.dim)
 
                     # GM-based differential vector
                     diff = np.abs(X[j] - X[k]) + 1e-16

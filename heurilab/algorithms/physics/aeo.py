@@ -23,24 +23,24 @@ class AEO(_Base):
             # Production (best individual = producer)
             # Herbivore/Omnivore/Carnivore operators
             for i in range(self.pop_size):
-                rand = np.random.rand()
+                rand = self.rng.random()
 
                 if rand < 1 / 3:
                     # Production operator (energy from environment)
-                    x1 = (1 - r) * lb + r * np.random.rand(self.dim) * (ub - lb)
+                    x1 = (1 - r) * lb + r * self.rng.random(self.dim) * (ub - lb)
                     new_X = best * (1 - r) + x1 * r
                 elif rand < 2 / 3:
                     # Consumption operator: herbivore
-                    j = np.random.randint(self.pop_size)
-                    C = np.random.rand() * r
+                    j = self.rng.integers(self.pop_size)
+                    C = self.rng.random() * r
                     if fitness[i] < fitness[j]:
                         new_X = X[i] + C * (X[i] - X[j])
                     else:
                         new_X = X[i] + C * (X[j] - X[i])
                 else:
                     # Consumption operator: carnivore
-                    j = np.random.randint(self.pop_size)
-                    C = np.random.rand() * r
+                    j = self.rng.integers(self.pop_size)
+                    C = self.rng.random() * r
                     new_X = X[i] + C * (best - X[j]) * r
 
                 new_X = self._clip(new_X)

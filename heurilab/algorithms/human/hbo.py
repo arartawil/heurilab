@@ -30,8 +30,8 @@ class HBO(_Base):
                 left = 2 * rank + 1
                 right = 2 * rank + 2
 
-                r1 = np.random.rand(self.dim)
-                r2 = np.random.rand(self.dim)
+                r1 = self.rng.random(self.dim)
+                r2 = self.rng.random(self.dim)
 
                 if rank == 0:
                     # Root: small random perturbation

@@ -25,23 +25,23 @@ class NOA(_Base):
             Pa = 0.2 + 0.6 * (t / self.max_iter)  # caching probability increases
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < Pa:
                     # Phase 1: Food storage/caching (exploration)
-                    r1 = np.random.randint(self.pop_size)
-                    r2 = np.random.randint(self.pop_size)
+                    r1 = self.rng.integers(self.pop_size)
+                    r2 = self.rng.integers(self.pop_size)
                     mu = (X[r1] + X[r2]) / 2
-                    new_X = mu + np.random.randn(self.dim) * np.abs(X[r1] - X[r2]) * (1 - t / self.max_iter)
+                    new_X = mu + self.rng.standard_normal(self.dim) * np.abs(X[r1] - X[r2]) * (1 - t / self.max_iter)
                 else:
                     # Phase 2: Food recovery (exploitation)
-                    if np.random.rand() < 0.5:
+                    if self.rng.random() < 0.5:
                         # Recover from cache near best
                         Levy = self._levy_flight()
                         new_X = best + Levy * (cache[i] - best) * (1 - t / self.max_iter)
                     else:
                         # Guided by best and second best
-                        r1 = np.random.rand(self.dim)
+                        r1 = self.rng.random(self.dim)
                         new_X = X[i] + r1 * (best - X[i]) + (1 - r1) * (second_best - X[i])
 
                 new_X = self._clip(new_X)
@@ -70,6 +70,6 @@ class NOA(_Base):
         beta = 1.5
         sigma = (math.gamma(1 + beta) * np.sin(np.pi * beta / 2) /
                  (math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
-        u = np.random.randn(self.dim) * sigma
-        v = np.random.randn(self.dim)
+        u = self.rng.standard_normal(self.dim) * sigma
+        v = self.rng.standard_normal(self.dim)
         return u / (np.abs(v) ** (1 / beta))

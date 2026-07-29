@@ -23,8 +23,8 @@ class HBA(_Base):
             alpha = C * np.exp(-t / self.max_iter)  # decreasing factor
 
             for i in range(self.pop_size):
-                r = np.random.rand()
-                F_flag = 1 if np.random.rand() < 0.5 else -1
+                r = self.rng.random()
+                F_flag = 1 if self.rng.random() < 0.5 else -1
 
                 # Intensity
                 di = np.linalg.norm(X[i] - best) + 1e-16
@@ -32,18 +32,18 @@ class HBA(_Base):
 
                 if r < 0.5:
                     # Digging phase (exploitation)
-                    r3 = np.random.rand()
-                    r4 = np.random.rand()
-                    r5 = np.random.rand()
-                    r6 = np.random.rand()
-                    r7 = np.random.rand()
+                    r3 = self.rng.random()
+                    r4 = self.rng.random()
+                    r5 = self.rng.random()
+                    r6 = self.rng.random()
+                    r7 = self.rng.random()
 
                     new_X = best + F_flag * C * alpha * S_i * (r3 * best - r4 * X[i])
                 else:
                     # Honey phase (exploration)
-                    r3 = np.random.rand()
-                    r4 = np.random.rand()
-                    r5 = np.random.rand()
+                    r3 = self.rng.random()
+                    r4 = self.rng.random()
+                    r5 = self.rng.random()
 
                     new_X = best + F_flag * alpha * r3 * S_i * np.abs(np.cos(2 * np.pi * r4) * (1 - np.cos(2 * np.pi * r5)))
 

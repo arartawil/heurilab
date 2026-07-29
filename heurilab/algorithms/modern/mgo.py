@@ -20,12 +20,12 @@ class MGO(_Base):
             M = np.zeros((self.pop_size, self.dim))
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
-                r2 = np.random.rand()
-                idx_rand = np.random.randint(self.pop_size)
+                r1 = self.rng.random()
+                r2 = self.rng.random()
+                idx_rand = self.rng.integers(self.pop_size)
 
                 # Territory selection coefficients
-                coef = np.random.randn(self.dim)
+                coef = self.rng.standard_normal(self.dim)
 
                 if r1 < 0.5:
                     # Exploration: herd interaction
@@ -38,11 +38,11 @@ class MGO(_Base):
                 if r2 < 0.5:
                     # Exploitation: grazing behavior
                     D = np.abs(best - X[i])
-                    A = 2 * a * np.random.rand(self.dim) - a
+                    A = 2 * a * self.rng.random(self.dim) - a
                     X[i] = best - D * A + M[i]
                 else:
                     # Running from predator
-                    r3 = np.random.rand(self.dim)
+                    r3 = self.rng.random(self.dim)
                     X[i] = (best - np.abs(best - X[i]) * np.cos(2 * np.pi * r3) *
                             (1 - t / self.max_iter)) + M[i]
 

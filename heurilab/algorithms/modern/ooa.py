@@ -19,9 +19,9 @@ class OOA(_Base):
             for i in range(self.pop_size):
                 # Phase 1: Position identification and fish hunting (exploration)
                 # Osprey identifies fish position
-                fish_pos = self.lb + np.random.rand(self.dim) * (self.ub - self.lb)
-                r = np.random.rand(self.dim)
-                I = np.random.choice([1, 2])
+                fish_pos = self.lb + self.rng.random(self.dim) * (self.ub - self.lb)
+                r = self.rng.random(self.dim)
+                I = self.rng.choice([1, 2])
 
                 fish_fit = self._eval(fish_pos)
                 if fish_fit < fitness[i]:
@@ -36,11 +36,11 @@ class OOA(_Base):
                     fitness[i] = new_fit
 
                 # Phase 2: Carrying fish to suitable position (exploitation)
-                j = np.random.randint(self.pop_size)
+                j = self.rng.integers(self.pop_size)
                 while j == i:
-                    j = np.random.randint(self.pop_size)
+                    j = self.rng.integers(self.pop_size)
 
-                r = np.random.rand(self.dim)
+                r = self.rng.random(self.dim)
                 sf = (1 - t / self.max_iter)  # shrinking factor
 
                 if fitness[i] < fitness[j]:

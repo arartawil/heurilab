@@ -29,7 +29,7 @@ class BFO(_Base):
             # ── Chemotaxis ──
             for i in range(self.pop_size):
                 # Random tumble direction
-                delta = np.random.randn(self.dim)
+                delta = self.rng.standard_normal(self.dim)
                 delta = delta / (np.linalg.norm(delta) + 1e-16)
 
                 step_size = 0.1 * (self.ub - self.lb) * (1 - t / self.max_iter)
@@ -61,8 +61,8 @@ class BFO(_Base):
 
             # ── Elimination-Dispersal ──
             for i in range(self.pop_size):
-                if np.random.rand() < p_ed:
-                    X[i] = np.random.uniform(self.lb, self.ub, self.dim)
+                if self.rng.random() < p_ed:
+                    X[i] = self.rng.uniform(self.lb, self.ub, self.dim)
                     fitness[i] = self._eval(X[i])
                     if fitness[i] < best_fit:
                         best = X[i].copy()

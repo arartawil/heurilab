@@ -24,27 +24,27 @@ class SHADE(_Base):
             S_CR, S_F, delta_f = [], [], []
 
             for i in range(self.pop_size):
-                ri = np.random.randint(H)
-                CR_i = np.clip(np.random.normal(M_CR[ri], 0.1), 0, 1)
-                F_i = min(1.0, max(0.01, M_F[ri] + 0.1 * np.random.standard_cauchy()))
+                ri = self.rng.integers(H)
+                CR_i = np.clip(self.rng.normal(M_CR[ri], 0.1), 0, 1)
+                F_i = min(1.0, max(0.01, M_F[ri] + 0.1 * self.rng.standard_cauchy()))
 
                 # current-to-pbest/1
                 p = max(2, int(0.1 * self.pop_size))
                 p_best_idx = np.argsort(fitness)[:p]
-                x_pbest = X[np.random.choice(p_best_idx)]
+                x_pbest = X[self.rng.choice(p_best_idx)]
 
                 idxs = list(range(self.pop_size))
                 idxs.remove(i)
-                r1, r2 = np.random.choice(idxs, 2, replace=False)
+                r1, r2 = self.rng.choice(idxs, 2, replace=False)
 
                 mutant = X[i] + F_i * (x_pbest - X[i]) + F_i * (X[r1] - X[r2])
                 mutant = self._clip(mutant)
 
                 # Binomial crossover
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR_i or j == j_rand:
+                    if self.rng.random() < CR_i or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

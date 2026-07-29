@@ -23,17 +23,17 @@ class EPO(_Base):
             ratio = t / self.max_iter
 
             # Huddle boundary
-            R = np.random.rand()
+            R = self.rng.random()
             if T == 0:
                 # Exploration: large radius
-                P = np.random.uniform(2, 3)
+                P = self.rng.uniform(2, 3)
             else:
                 # Exploitation: small radius
-                P = np.random.uniform(0, 2)
+                P = self.rng.uniform(0, 2)
 
             for i in range(self.pop_size):
-                r = np.random.rand(self.dim)
-                theta = np.random.rand() * 2 * np.pi
+                r = self.rng.random(self.dim)
+                theta = self.rng.random() * 2 * np.pi
                 A = (M * (T + P) * r - T) * np.cos(theta)
 
                 # Social forces

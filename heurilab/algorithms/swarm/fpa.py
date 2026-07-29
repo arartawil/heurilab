@@ -1,5 +1,6 @@
 """FPA — Flower Pollination Algorithm"""
 
+import math
 import numpy as np
 from heurilab.algorithms.base import _Base
 
@@ -19,22 +20,22 @@ class FPA(_Base):
         convergence = [best_fit]
 
         sigma_u = (
-            np.math.gamma(1 + beta) * np.sin(np.pi * beta / 2)
-            / (np.math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))
+            math.gamma(1 + beta) * np.sin(np.pi * beta / 2)
+            / (math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))
         ) ** (1 / beta)
 
         for t in range(self.max_iter):
             for i in range(self.pop_size):
-                if np.random.rand() < p:
+                if self.rng.random() < p:
                     # Global pollination via Lévy flights
-                    u = np.random.randn(self.dim) * sigma_u
-                    v = np.random.randn(self.dim)
+                    u = self.rng.standard_normal(self.dim) * sigma_u
+                    v = self.rng.standard_normal(self.dim)
                     L = u / (np.abs(v) ** (1 / beta))
                     new_X = X[i] + L * (best - X[i])
                 else:
                     # Local pollination
-                    j, k = np.random.randint(0, self.pop_size, 2)
-                    eps = np.random.rand()
+                    j, k = self.rng.integers(0, self.pop_size, 2)
+                    eps = self.rng.random()
                     new_X = X[i] + eps * (X[j] - X[k])
 
                 new_X = self._clip(new_X)

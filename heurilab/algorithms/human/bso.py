@@ -22,7 +22,7 @@ class BSO(_Base):
 
         for t in range(self.max_iter):
             # Simple K-means-like clustering
-            centers = X[np.random.choice(self.pop_size, min(n_clusters, self.pop_size), replace=False)].copy()
+            centers = X[self.rng.choice(self.pop_size, min(n_clusters, self.pop_size), replace=False)].copy()
             labels = np.zeros(self.pop_size, dtype=int)
 
             for _ in range(3):  # Few iterations of assignment
@@ -42,31 +42,31 @@ class BSO(_Base):
                     cluster_bests[c] = mask[np.argmin(fitness[mask])]
 
             # Randomly replace a cluster center
-            if np.random.rand() < p_replace and len(cluster_bests) > 0:
-                c = np.random.choice(list(cluster_bests.keys()))
-                centers[c] = np.random.uniform(self.lb, self.ub, self.dim)
+            if self.rng.random() < p_replace and len(cluster_bests) > 0:
+                c = self.rng.choice(list(cluster_bests.keys()))
+                centers[c] = self.rng.uniform(self.lb, self.ub, self.dim)
 
             # Generate new individuals
             k = 20 * (1 - t / self.max_iter)  # Decreasing step size
 
             for i in range(self.pop_size):
-                if np.random.rand() < p_one:
+                if self.rng.random() < p_one:
                     # Select one cluster
                     c = labels[i]
-                    if np.random.rand() < p_center:
-                        new_X = centers[c] + np.random.randn(self.dim) * k
+                    if self.rng.random() < p_center:
+                        new_X = centers[c] + self.rng.standard_normal(self.dim) * k
                     else:
-                        idx = np.random.choice(np.where(labels == c)[0])
-                        new_X = X[idx] + np.random.randn(self.dim) * k
+                        idx = self.rng.choice(np.where(labels == c)[0])
+                        new_X = X[idx] + self.rng.standard_normal(self.dim) * k
                 else:
                     # Combine two clusters
                     available = list(cluster_bests.keys())
                     if len(available) >= 2:
-                        c1, c2 = np.random.choice(available, 2, replace=False)
-                        r = np.random.rand()
-                        new_X = r * centers[c1] + (1 - r) * centers[c2] + np.random.randn(self.dim) * k
+                        c1, c2 = self.rng.choice(available, 2, replace=False)
+                        r = self.rng.random()
+                        new_X = r * centers[c1] + (1 - r) * centers[c2] + self.rng.standard_normal(self.dim) * k
                     else:
-                        new_X = X[i] + np.random.randn(self.dim) * k
+                        new_X = X[i] + self.rng.standard_normal(self.dim) * k
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

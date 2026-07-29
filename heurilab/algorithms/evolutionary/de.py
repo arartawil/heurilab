@@ -21,16 +21,16 @@ class DE(_Base):
                 # Select 3 distinct individuals != i
                 idxs = list(range(self.pop_size))
                 idxs.remove(i)
-                a, b, c = np.random.choice(idxs, 3, replace=False)
+                a, b, c = self.rng.choice(idxs, 3, replace=False)
 
                 # Mutation
                 mutant = self._clip(X[a] + F * (X[b] - X[c]))
 
                 # Crossover
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR or j == j_rand:
+                    if self.rng.random() < CR or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial = self._clip(trial)

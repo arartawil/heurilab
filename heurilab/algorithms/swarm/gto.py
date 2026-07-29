@@ -20,32 +20,32 @@ class GTO(_Base):
         convergence = [best_fit]
 
         for t in range(self.max_iter):
-            a = (np.cos(2 * np.random.rand()) + 1) * (1 - t / self.max_iter)
-            C = a * (2 * np.random.rand() - 1)  # Controlling parameter
+            a = (np.cos(2 * self.rng.random()) + 1) * (1 - t / self.max_iter)
+            C = a * (2 * self.rng.random() - 1)  # Controlling parameter
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
+                r1 = self.rng.random()
 
                 if np.abs(C) >= 1:
                     # Exploration
                     if r1 < p:
                         # Migration to unknown place
-                        new_X = (self.ub - self.lb) * np.random.rand(self.dim) + self.lb
+                        new_X = (self.ub - self.lb) * self.rng.random(self.dim) + self.lb
                     else:
                         # Move toward another gorilla
-                        j = np.random.randint(self.pop_size)
-                        r2 = np.random.rand()
+                        j = self.rng.integers(self.pop_size)
+                        r2 = self.rng.random()
                         new_X = (r2 - a) * X[j] + (1 - r2 + a) * X[i]
                 else:
                     # Exploitation
                     if r1 >= 0.5:
                         # Follow the silverback
-                        A = beta_gto * np.random.randn(self.dim)
-                        new_X = best - np.abs(best - X[i]) * A * np.sign(np.random.rand(self.dim) - 0.5)
+                        A = beta_gto * self.rng.standard_normal(self.dim)
+                        new_X = best - np.abs(best - X[i]) * A * np.sign(self.rng.random(self.dim) - 0.5)
                     else:
                         # Competition for females
-                        L = C * np.random.randn(self.dim)
-                        r3 = np.random.rand()
+                        L = C * self.rng.standard_normal(self.dim)
+                        r3 = self.rng.random()
                         new_X = X[i] - L * (L * (X[i] - best) + r3 * (X[i] - best))
 
                 new_X = self._clip(new_X)

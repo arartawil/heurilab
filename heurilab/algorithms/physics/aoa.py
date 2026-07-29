@@ -25,7 +25,7 @@ class AOA(_Base):
 
             for i in range(self.pop_size):
                 for j in range(self.dim):
-                    r1, r2, r3 = np.random.rand(), np.random.rand(), np.random.rand()
+                    r1, r2, r3 = self.rng.random(), self.rng.random(), self.rng.random()
                     if r1 > MOA:
                         # Exploration
                         if r2 > 0.5:

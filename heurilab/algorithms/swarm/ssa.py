@@ -21,7 +21,7 @@ class SSA(_Base):
             for i in range(self.pop_size):
                 if i == 0:  # Leader
                     for j in range(self.dim):
-                        c2, c3 = np.random.rand(), np.random.rand()
+                        c2, c3 = self.rng.random(), self.rng.random()
                         if c3 < 0.5:
                             X[i, j] = best[j] + c1 * ((self.ub[j] - self.lb[j]) * c2 + self.lb[j])
                         else:

@@ -20,14 +20,14 @@ class GA(_Base):
             # Tournament selection
             new_pop = np.empty_like(X)
             for i in range(self.pop_size):
-                a, b = np.random.randint(0, self.pop_size, 2)
+                a, b = self.rng.integers(0, self.pop_size, 2)
                 new_pop[i] = X[a].copy() if fitness[a] < fitness[b] else X[b].copy()
 
             # SBX crossover
             for i in range(0, self.pop_size - 1, 2):
-                if np.random.rand() < pc:
+                if self.rng.random() < pc:
                     eta = 20
-                    u = np.random.rand(self.dim)
+                    u = self.rng.random(self.dim)
                     beta_q = np.where(u <= 0.5,
                                       (2 * u) ** (1 / (eta + 1)),
                                       (1 / (2 * (1 - u))) ** (1 / (eta + 1)))
@@ -39,9 +39,9 @@ class GA(_Base):
             # Polynomial mutation
             for i in range(self.pop_size):
                 for j in range(self.dim):
-                    if np.random.rand() < pm:
+                    if self.rng.random() < pm:
                         eta_m = 20
-                        r = np.random.rand()
+                        r = self.rng.random()
                         delta = (2 * r) ** (1 / (eta_m + 1)) - 1 if r < 0.5 else 1 - (2 * (1 - r)) ** (1 / (eta_m + 1))
                         new_pop[i, j] += delta * (self.ub[j] - self.lb[j])
                         new_pop[i, j] = np.clip(new_pop[i, j], self.lb[j], self.ub[j])

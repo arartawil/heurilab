@@ -21,24 +21,24 @@ class TSO(_Base):
             T = 1 - t / self.max_iter  # Transient factor (decreases)
 
             for i in range(self.pop_size):
-                r1 = np.random.rand()
-                r2 = np.random.rand()
+                r1 = self.rng.random()
+                r2 = self.rng.random()
 
                 if r1 < 0.5:
                     # Source current (exploitation) — damped oscillation toward best
-                    omega = 2 * np.pi * np.random.rand()
-                    damping = np.exp(-T * np.random.rand())
+                    omega = 2 * np.pi * self.rng.random()
+                    damping = np.exp(-T * self.rng.random())
                     new_X = best + damping * np.cos(omega) * (X[i] - best)
                 else:
                     # Transient response (exploration)
                     if r2 < 0.5:
                         # Over-damped
-                        r3 = np.random.randint(self.pop_size)
-                        new_X = X[r3] + T * np.random.randn(self.dim) * (ub - lb) * 0.1
+                        r3 = self.rng.integers(self.pop_size)
+                        new_X = X[r3] + T * self.rng.standard_normal(self.dim) * (ub - lb) * 0.1
                     else:
                         # Under-damped with oscillation
-                        alpha_t = 2 * T * np.random.rand()
-                        new_X = X[i] + alpha_t * (best - X[i]) * np.sin(2 * np.pi * np.random.rand())
+                        alpha_t = 2 * T * self.rng.random()
+                        new_X = X[i] + alpha_t * (best - X[i]) * np.sin(2 * np.pi * self.rng.random())
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

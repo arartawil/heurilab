@@ -21,8 +21,8 @@ class SHO(_Base):
             h_val = h - t * (h / self.max_iter)
 
             for i in range(self.pop_size):
-                r1 = np.random.rand(self.dim)
-                r2 = np.random.rand(self.dim)
+                r1 = self.rng.random(self.dim)
+                r2 = self.rng.random(self.dim)
 
                 B = 2 * r1  # Encircling coefficient
                 E = 2 * h_val * r2 - h_val  # Updated coefficient
@@ -30,7 +30,7 @@ class SHO(_Base):
                 D = np.abs(B * best - X[i])
 
                 # Cluster formation: aggregate N best hyenas
-                N = max(1, int(np.ceil(np.random.rand() * self.pop_size * 0.3)))
+                N = max(1, int(np.ceil(self.rng.random() * self.pop_size * 0.3)))
                 sorted_idx = np.argsort(fitness)[:N]
                 cluster_center = np.mean(X[sorted_idx], axis=0)
 

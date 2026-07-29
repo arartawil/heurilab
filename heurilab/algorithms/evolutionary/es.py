@@ -27,9 +27,9 @@ class ES(_Base):
             offspring_fit = []
 
             for _ in range(lam):
-                parent = np.random.randint(mu)
-                s_new = sigma[parent] * np.exp(tau_prime * np.random.randn() + tau * np.random.randn(self.dim))
-                x_new = self._clip(X[parent] + s_new * np.random.randn(self.dim))
+                parent = self.rng.integers(mu)
+                s_new = sigma[parent] * np.exp(tau_prime * self.rng.standard_normal() + tau * self.rng.standard_normal(self.dim))
+                x_new = self._clip(X[parent] + s_new * self.rng.standard_normal(self.dim))
                 offspring_X.append(x_new)
                 offspring_sigma.append(s_new)
                 offspring_fit.append(self._eval(x_new))

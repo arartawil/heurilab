@@ -21,22 +21,22 @@ class EDO(_Base):
             mu_guide = np.mean(X, axis=0)
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.5:
                     # Exploitation: exponential distribution guided search
                     lam = 1 / (np.abs(best - X[i]) + 1e-16)
                     # Exponential random variate per dimension
-                    exp_rand = -np.log(np.random.rand(self.dim) + 1e-16) / (lam + 1e-16)
+                    exp_rand = -np.log(self.rng.random(self.dim) + 1e-16) / (lam + 1e-16)
                     # Clip exponential values to avoid overflow
                     exp_rand = np.minimum(exp_rand, self.ub - self.lb)
                     direction = np.sign(best - X[i])
                     new_X = X[i] + direction * exp_rand * (1 - t / self.max_iter)
                 else:
                     # Exploration: guided by population mean and random walk
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand(self.dim)
-                    j = np.random.randint(self.pop_size)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random(self.dim)
+                    j = self.rng.integers(self.pop_size)
                     new_X = X[i] + alpha * r1 * (mu_guide - X[i]) + r2 * (X[j] - X[i])
 
                 new_X = self._clip(new_X)

@@ -40,7 +40,7 @@ class POA(_Base):
                 for m in party:
                     if m == leader:
                         continue
-                    r = np.random.rand()
+                    r = self.rng.random()
                     new_X = X[m] + r * (X[leader] - X[m])
                     new_X = self._clip(new_X)
                     new_fit = self._eval(new_X)
@@ -51,9 +51,9 @@ class POA(_Base):
             # Phase 2: Party switching
             for p, party in enumerate(parties):
                 for m in party:
-                    if np.random.rand() < 0.2 * (1 - t / self.max_iter):
-                        other_leader = leaders[np.random.randint(n_parties)]
-                        r = np.random.rand()
+                    if self.rng.random() < 0.2 * (1 - t / self.max_iter):
+                        other_leader = leaders[self.rng.integers(n_parties)]
+                        r = self.rng.random()
                         new_X = X[m] + r * (X[other_leader] - X[m])
                         new_X = self._clip(new_X)
                         new_fit = self._eval(new_X)
@@ -63,7 +63,7 @@ class POA(_Base):
 
             # Phase 3: Election campaign — move toward global best
             for i in range(total):
-                r = np.random.rand()
+                r = self.rng.random()
                 new_X = X[i] + r * (best - X[i])
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

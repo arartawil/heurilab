@@ -47,7 +47,7 @@ class CFO(_Base):
 
             # Update velocity and position
             dt = 1.0
-            V = np.random.rand(self.pop_size, self.dim) * V + accel * dt
+            V = self.rng.random((self.pop_size, self.dim)) * V + accel * dt
             X = self._clip(X + V * dt)
 
             fitness = np.array([self._eval(X[i]) for i in range(self.pop_size)])

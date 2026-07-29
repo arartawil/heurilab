@@ -10,7 +10,7 @@ class ABC(_Base):
         n_employed = self.pop_size // 2
         n_onlooker = self.pop_size - n_employed
 
-        X = np.random.uniform(self.lb, self.ub, (n_employed, self.dim))
+        X = self.rng.uniform(self.lb, self.ub, (n_employed, self.dim))
         fitness = np.array([self._eval(X[i]) for i in range(n_employed)])
         trial_counter = np.zeros(n_employed, dtype=int)
 
@@ -23,11 +23,11 @@ class ABC(_Base):
         for t in range(self.max_iter):
             # ── Employed Bees ──
             for i in range(n_employed):
-                k = np.random.randint(n_employed)
+                k = self.rng.integers(n_employed)
                 while k == i:
-                    k = np.random.randint(n_employed)
-                j = np.random.randint(self.dim)
-                phi = np.random.uniform(-1, 1)
+                    k = self.rng.integers(n_employed)
+                j = self.rng.integers(self.dim)
+                phi = self.rng.uniform(-1, 1)
 
                 new_X = X[i].copy()
                 new_X[j] = X[i, j] + phi * (X[i, j] - X[k, j])
@@ -46,12 +46,12 @@ class ABC(_Base):
             probs = fit_vals / np.sum(fit_vals)
 
             for _ in range(n_onlooker):
-                i = np.random.choice(n_employed, p=probs)
-                k = np.random.randint(n_employed)
+                i = self.rng.choice(n_employed, p=probs)
+                k = self.rng.integers(n_employed)
                 while k == i:
-                    k = np.random.randint(n_employed)
-                j = np.random.randint(self.dim)
-                phi = np.random.uniform(-1, 1)
+                    k = self.rng.integers(n_employed)
+                j = self.rng.integers(self.dim)
+                phi = self.rng.uniform(-1, 1)
 
                 new_X = X[i].copy()
                 new_X[j] = X[i, j] + phi * (X[i, j] - X[k, j])
@@ -68,7 +68,7 @@ class ABC(_Base):
             # ── Scout Bees ──
             for i in range(n_employed):
                 if trial_counter[i] > limit:
-                    X[i] = np.random.uniform(self.lb, self.ub, self.dim)
+                    X[i] = self.rng.uniform(self.lb, self.ub, self.dim)
                     fitness[i] = self._eval(X[i])
                     trial_counter[i] = 0
 

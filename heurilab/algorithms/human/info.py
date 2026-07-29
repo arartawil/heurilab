@@ -21,10 +21,10 @@ class INFO(_Base):
             alpha = 2 * np.exp(-(4 * t / self.max_iter) ** 2)
 
             for i in range(self.pop_size):
-                r1, r2, r3 = np.random.rand(), np.random.rand(), np.random.rand()
+                r1, r2, r3 = self.rng.random(), self.rng.random(), self.rng.random()
 
                 # Select three random vectors
-                a, b, c = np.random.choice(self.pop_size, 3, replace=False)
+                a, b, c = self.rng.choice(self.pop_size, 3, replace=False)
 
                 # Weighted mean direction
                 eps = 1e-16
@@ -37,7 +37,7 @@ class INFO(_Base):
 
                 if r1 < 0.5:
                     # Rule 1: Update via weighted mean and best
-                    z = np.random.randint(self.dim)
+                    z = self.rng.integers(self.dim)
                     new_X = X[i].copy()
                     new_X[z] = X[i, z] + alpha * r2 * (best[z] - np.abs(mean_vec[z]))
                 else:

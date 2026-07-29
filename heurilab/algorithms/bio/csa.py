@@ -22,15 +22,15 @@ class CSA(_Base):
 
         for t in range(self.max_iter):
             for i in range(self.pop_size):
-                j = np.random.randint(self.pop_size)  # Random crow to follow
+                j = self.rng.integers(self.pop_size)  # Random crow to follow
 
-                if np.random.rand() >= AP:
+                if self.rng.random() >= AP:
                     # Crow j doesn't notice: follow its memory
-                    r = np.random.rand()
+                    r = self.rng.random()
                     new_X = X[i] + r * fl * (memory[j] - X[i])
                 else:
                     # Crow j notices: go to random position
-                    new_X = np.random.uniform(self.lb, self.ub, self.dim)
+                    new_X = self.rng.uniform(self.lb, self.ub, self.dim)
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

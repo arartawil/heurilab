@@ -25,7 +25,7 @@ class CoDE(_Base):
                 trial_fits = []
 
                 for s in range(3):
-                    F = F_pool[s] * np.random.rand()
+                    F = F_pool[s] * self.rng.random()
                     CR = CR_pool[s]
 
                     idxs = list(range(self.pop_size))
@@ -33,25 +33,25 @@ class CoDE(_Base):
 
                     if s == 0:
                         # rand/1/bin
-                        r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
+                        r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
                         mutant = X[r1] + F * (X[r2] - X[r3])
                     elif s == 1:
                         # rand/2/bin
-                        r1, r2, r3, r4, r5 = np.random.choice(idxs, 5, replace=False)
+                        r1, r2, r3, r4, r5 = self.rng.choice(idxs, 5, replace=False)
                         mutant = X[r1] + F * (X[r2] - X[r3]) + F * (X[r4] - X[r5])
                     else:
                         # current-to-rand/1
-                        r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
-                        K = np.random.rand()
+                        r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
+                        K = self.rng.random()
                         mutant = X[i] + K * (X[r1] - X[i]) + F * (X[r2] - X[r3])
 
                     mutant = self._clip(mutant)
 
                     # Crossover
                     trial = X[i].copy()
-                    j_rand = np.random.randint(self.dim)
+                    j_rand = self.rng.integers(self.dim)
                     for j in range(self.dim):
-                        if np.random.rand() < CR or j == j_rand:
+                        if self.rng.random() < CR or j == j_rand:
                             trial[j] = mutant[j]
 
                     trial_fit = self._eval(trial)

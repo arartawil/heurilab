@@ -1,7 +1,7 @@
 """SBO — Satin Bowerbird Optimizer"""
 
 import numpy as np
-from heurilab.algorithms.base import _Base
+from heurilab.algorithms.base import _Base, roulette_probabilities
 
 
 class SBO(_Base):
@@ -21,20 +21,18 @@ class SBO(_Base):
         for t in range(self.max_iter):
             # Probability of each bower based on fitness
             max_fit = np.max(fitness)
-            eps = 1e-16
-            probs = (max_fit - fitness + eps)
-            probs = probs / (np.sum(probs) + eps)
+            probs = roulette_probabilities(max_fit - fitness)
 
             for i in range(self.pop_size):
                 new_X = X[i].copy()
 
                 for j in range(self.dim):
-                    if np.random.rand() < z:
+                    if self.rng.random() < z:
                         # Mutation: random value
-                        new_X[j] = np.random.uniform(self.lb[j], self.ub[j])
+                        new_X[j] = self.rng.uniform(self.lb[j], self.ub[j])
                     else:
                         # Select an elite bower via roulette
-                        k = np.random.choice(self.pop_size, p=probs)
+                        k = self.rng.choice(self.pop_size, p=probs)
                         lam = alpha_sbo / (1 + probs[k])
                         new_X[j] = X[i, j] + lam * ((X[k, j] + best[j]) / 2.0 - X[i, j])
 

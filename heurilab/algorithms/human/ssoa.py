@@ -29,15 +29,15 @@ class SSOA(_Base):
             X = X[sorted_idx]
             fitness = fitness[sorted_idx]
 
-            R2 = np.random.rand()  # alarm value
+            R2 = self.rng.random()  # alarm value
 
             # Producers (discoverers) — best individuals
             for i in range(n_producers):
                 if R2 < ST:
-                    alpha = np.random.rand()
+                    alpha = self.rng.random()
                     X[i] = X[i] * np.exp(-i / (alpha * self.max_iter + 1e-16))
                 else:
-                    Q = np.random.randn(self.dim)
+                    Q = self.rng.standard_normal(self.dim)
                     X[i] = X[i] + Q
 
                 X[i] = self._clip(X[i])
@@ -47,25 +47,25 @@ class SSOA(_Base):
             for i in range(n_producers, self.pop_size):
                 if i > self.pop_size // 2:
                     # Worst half — go to random location
-                    Q = np.random.randn(self.dim)
+                    Q = self.rng.standard_normal(self.dim)
                     X[i] = Q * np.exp((fitness[-1] - fitness[i]) / (i * i + 1e-16))
                 else:
                     # Follow the best producer
-                    A = np.random.choice([-1, 1], size=(self.dim,))
+                    A = self.rng.choice([-1, 1], size=(self.dim,))
                     A_plus = A / (A @ A + 1e-16)
                     X[i] = X[0] + np.abs(X[i] - X[0]) * A_plus
 
                 X[i] = self._clip(X[i])
 
             # Danger awareness — scouts
-            danger_idx = np.random.choice(self.pop_size, n_danger, replace=False)
+            danger_idx = self.rng.choice(self.pop_size, n_danger, replace=False)
             for idx in danger_idx:
                 if fitness[idx] > np.mean(fitness):
-                    beta = np.random.randn(self.dim)
+                    beta = self.rng.standard_normal(self.dim)
                     X[idx] = best + beta * np.abs(X[idx] - best)
                 elif fitness[idx] == best_fit:
                     eps_val = 1e-10
-                    K = np.random.uniform(-1, 1)
+                    K = self.rng.uniform(-1, 1)
                     X[idx] = X[idx] + K * (np.abs(X[idx] - best) / (fitness[idx] - best_fit + eps_val))
 
                 X[idx] = self._clip(X[idx])

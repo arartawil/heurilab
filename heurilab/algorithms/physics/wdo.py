@@ -28,9 +28,9 @@ class WDO(_Base):
 
             for i in range(self.pop_size):
                 # Pick a random other air parcel
-                j = np.random.randint(self.pop_size)
+                j = self.rng.integers(self.pop_size)
                 while j == i:
-                    j = np.random.randint(self.pop_size)
+                    j = self.rng.integers(self.pop_size)
 
                 # Coriolis-like cross-dimensional effect
                 other_dims = np.roll(V[i], 1)

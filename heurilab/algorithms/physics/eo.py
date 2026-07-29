@@ -28,15 +28,15 @@ class EO(_Base):
 
             for i in range(self.pop_size):
                 # Random equilibrium candidate
-                eq = C_eq[np.random.randint(len(C_eq))]
+                eq = C_eq[self.rng.integers(len(C_eq))]
 
-                r = np.random.rand(self.dim)
-                lam = np.random.rand(self.dim)
+                r = self.rng.random(self.dim)
+                lam = self.rng.random(self.dim)
                 F = a1 * np.sign(r - 0.5) * (np.exp(-lam * tt) - 1)
 
                 # Generation rate
-                if np.random.rand() < GP:
-                    GCP = 0.5 * np.random.rand(self.dim)
+                if self.rng.random() < GP:
+                    GCP = 0.5 * self.rng.random(self.dim)
                 else:
                     GCP = np.zeros(self.dim)
                 G = GCP * (eq - lam * X[i])

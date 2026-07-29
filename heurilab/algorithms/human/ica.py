@@ -30,7 +30,7 @@ class ICA(_Base):
             probs = np.max(imp_costs) - imp_costs + 1e-16
             probs = probs / np.sum(probs)
             for col in col_idx:
-                chosen = np.random.choice(imp_idx, p=probs)
+                chosen = self.rng.choice(imp_idx, p=probs)
                 empire_map[chosen].append(col)
 
         convergence = [best_fit]
@@ -41,11 +41,11 @@ class ICA(_Base):
 
                 for col in colonies:
                     # Assimilation
-                    X[col] += 2 * zeta * np.random.rand(self.dim) * (X[imp] - X[col])
+                    X[col] += 2 * zeta * self.rng.random(self.dim) * (X[imp] - X[col])
                     # Revolution (small random perturbation)
-                    if np.random.rand() < 0.1:
-                        j = np.random.randint(self.dim)
-                        X[col, j] = np.random.uniform(self.lb[j], self.ub[j])
+                    if self.rng.random() < 0.1:
+                        j = self.rng.integers(self.dim)
+                        X[col, j] = self.rng.uniform(self.lb[j], self.ub[j])
                     X[col] = self._clip(X[col])
                     fitness[col] = self._eval(X[col])
 

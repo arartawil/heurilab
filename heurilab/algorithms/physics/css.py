@@ -42,7 +42,7 @@ class CSS(_Base):
                         force_mag = q[j] * (X[j] - X[i]) / (r_ij ** 2 + eps)
 
                     p_ij = 1.0 if fitness[j] < fitness[i] else 0.0
-                    force[i] += np.random.rand() * force_mag * p_ij
+                    force[i] += self.rng.random() * force_mag * p_ij
 
             ka = 0.5 * (1 - t / self.max_iter)
             kv = 0.5 * (1 + t / self.max_iter)

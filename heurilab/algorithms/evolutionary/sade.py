@@ -37,28 +37,28 @@ class SaDE(_Base):
                 nf[:] = 0
 
             for i in range(self.pop_size):
-                strat = np.random.choice(n_strat, p=p_strat)
-                CR = np.clip(np.random.normal(CR_mean[strat], 0.1), 0, 1)
-                F = np.clip(np.random.normal(0.5, 0.3), 0.01, 2.0)
+                strat = self.rng.choice(n_strat, p=p_strat)
+                CR = np.clip(self.rng.normal(CR_mean[strat], 0.1), 0, 1)
+                F = np.clip(self.rng.normal(0.5, 0.3), 0.01, 2.0)
 
                 idxs = list(range(self.pop_size))
                 idxs.remove(i)
 
                 if strat == 0:
                     # rand/1/bin
-                    r1, r2, r3 = np.random.choice(idxs, 3, replace=False)
+                    r1, r2, r3 = self.rng.choice(idxs, 3, replace=False)
                     mutant = X[r1] + F * (X[r2] - X[r3])
                 else:
                     # current-to-best/1/bin
-                    r1, r2 = np.random.choice(idxs, 2, replace=False)
+                    r1, r2 = self.rng.choice(idxs, 2, replace=False)
                     mutant = X[i] + F * (best - X[i]) + F * (X[r1] - X[r2])
 
                 mutant = self._clip(mutant)
 
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR or j == j_rand:
+                    if self.rng.random() < CR or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

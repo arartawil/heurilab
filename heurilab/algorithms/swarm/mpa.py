@@ -21,7 +21,7 @@ class MPA(_Base):
             CF = (1 - t / self.max_iter) ** (2 * t / self.max_iter)
 
             for i in range(self.pop_size):
-                R = np.random.rand(self.dim)
+                R = self.rng.random(self.dim)
 
                 if t < self.max_iter / 3:
                     # Phase 1: High velocity ratio — Brownian
@@ -45,11 +45,11 @@ class MPA(_Base):
                 X[i] = self._clip(X[i])
 
             # FADs effect
-            if np.random.rand() < FADs:
+            if self.rng.random() < FADs:
                 for i in range(self.pop_size):
-                    if np.random.rand() < FADs:
-                        u = np.random.rand(self.dim) < FADs
-                        X[i] = X[i] + CF * (self.lb + np.random.rand(self.dim) * (self.ub - self.lb)) * u.astype(float)
+                    if self.rng.random() < FADs:
+                        u = self.rng.random(self.dim) < FADs
+                        X[i] = X[i] + CF * (self.lb + self.rng.random(self.dim) * (self.ub - self.lb)) * u.astype(float)
                         X[i] = self._clip(X[i])
 
             fitness = np.array([self._eval(X[i]) for i in range(self.pop_size)])

@@ -27,7 +27,7 @@ class CMA(_Base):
         cmu = min(1 - c1, 2 * (mu_eff - 2 + 1 / mu_eff) / ((n + 2) ** 2 + mu_eff))
 
         # State
-        mean = np.random.uniform(self.lb, self.ub)
+        mean = self.rng.uniform(self.lb, self.ub)
         C = np.eye(n)
         ps = np.zeros(n)
         pc = np.zeros(n)
@@ -46,7 +46,7 @@ class CMA(_Base):
                 C = np.eye(n)
                 sqrt_C = np.eye(n)
 
-            Z = np.random.randn(lam, n)
+            Z = self.rng.standard_normal((lam, n))
             X = np.array([self._clip(mean + sigma * sqrt_C @ z) for z in Z])
             fitness = np.array([self._eval(X[i]) for i in range(lam)])
 

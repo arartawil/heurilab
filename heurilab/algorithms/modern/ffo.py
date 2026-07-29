@@ -20,35 +20,35 @@ class FFO(_Base):
             a = 2 * T_f  # adaptive coefficient
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < 0.5:
                     # Phase 1: Hearing-based hunting (exploration)
                     # Fennec fox uses large ears to detect underground prey
-                    r1 = np.random.rand(self.dim)
-                    j = np.random.randint(self.pop_size)
+                    r1 = self.rng.random(self.dim)
+                    j = self.rng.integers(self.pop_size)
 
                     # Sound intensity decreases with distance
                     dist = np.abs(X[j] - X[i]) + 1e-16
                     hearing_range = a * np.exp(-dist)
-                    new_X = X[i] + hearing_range * np.random.randn(self.dim) + r1 * (best - X[i]) * T_f
+                    new_X = X[i] + hearing_range * self.rng.standard_normal(self.dim) + r1 * (best - X[i]) * T_f
 
                 else:
                     # Phase 2: Digging for prey (exploitation)
                     # Fennec fox digs toward food source (best)
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand()
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random()
 
                     if r2 < 0.5:
                         # Spiral digging pattern
                         D = np.abs(best - X[i])
-                        l = np.random.uniform(-1, 1)
+                        l = self.rng.uniform(-1, 1)
                         b = 1  # spiral shape constant
                         new_X = D * np.exp(b * l) * np.cos(2 * np.pi * l) + best
                     else:
                         # Direct approach with thermal regulation
                         # Fennec fox adapts to temperature (iteration progress)
-                        new_X = best + a * r1 * (best - X[i]) * (2 * np.random.rand() - 1)
+                        new_X = best + a * r1 * (best - X[i]) * (2 * self.rng.random() - 1)
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

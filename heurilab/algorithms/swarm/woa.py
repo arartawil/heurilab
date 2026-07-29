@@ -18,19 +18,19 @@ class WOA(_Base):
         for t in range(self.max_iter):
             a = 2 - 2 * t / self.max_iter
             b = 1
-            l_param = np.random.uniform(-1, 1, self.pop_size)
+            l_param = self.rng.uniform(-1, 1, self.pop_size)
 
             for i in range(self.pop_size):
-                r = np.random.rand()
-                A = 2 * a * np.random.rand(self.dim) - a
-                C = 2 * np.random.rand(self.dim)
+                r = self.rng.random()
+                A = 2 * a * self.rng.random(self.dim) - a
+                C = 2 * self.rng.random(self.dim)
 
                 if r < 0.5:
                     if np.abs(A).mean() < 1:
                         D = np.abs(C * best - X[i])
                         X[i] = best - A * D
                     else:
-                        rand_idx = np.random.randint(self.pop_size)
+                        rand_idx = self.rng.integers(self.pop_size)
                         D = np.abs(C * X[rand_idx] - X[i])
                         X[i] = X[rand_idx] - A * D
                 else:

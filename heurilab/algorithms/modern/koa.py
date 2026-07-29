@@ -21,7 +21,7 @@ class KOA(_Base):
             h = 2 * (1 - T_ratio)  # gravitational coefficient
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 # Orbital distance and velocity
                 R_dist = np.linalg.norm(best - X[i]) + 1e-16
@@ -31,19 +31,19 @@ class KOA(_Base):
                     # Kepler's first law: elliptical orbit (exploitation)
                     # Semi-major axis decreases with iteration
                     a_orbit = h * np.abs(best - X[i])
-                    e = np.random.rand()  # eccentricity [0,1)
-                    theta = 2 * np.pi * np.random.rand(self.dim)
+                    e = self.rng.random()  # eccentricity [0,1)
+                    theta = 2 * np.pi * self.rng.random(self.dim)
 
                     # Orbital position update
                     r_orbit = a_orbit * (1 - e ** 2) / (1 + e * np.cos(theta) + 1e-16)
-                    new_X = best + r_orbit * np.sign(np.random.randn(self.dim))
+                    new_X = best + r_orbit * np.sign(self.rng.standard_normal(self.dim))
                 else:
                     # Kepler's third law: gravitational attraction (exploration)
-                    j = np.random.randint(self.pop_size)
+                    j = self.rng.integers(self.pop_size)
                     F_grav = M / (R_dist ** 2 + 1e-16)
                     F_grav = min(F_grav, 10)  # cap force
-                    r1 = np.random.rand(self.dim)
-                    new_X = X[i] + h * r1 * F_grav * (best - X[i]) + (1 - h) * np.random.randn(self.dim) * (X[j] - X[i])
+                    r1 = self.rng.random(self.dim)
+                    new_X = X[i] + h * r1 * F_grav * (best - X[i]) + (1 - h) * self.rng.standard_normal(self.dim) * (X[j] - X[i])
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)

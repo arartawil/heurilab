@@ -27,16 +27,16 @@ class AGDE(_Base):
             for i in range(self.pop_size):
                 # Adaptive F and CR based on generation
                 ratio = t / self.max_iter
-                F = 0.1 + 0.9 * np.random.rand() * (1 - ratio)
-                CR = 0.1 + 0.8 * np.random.rand()
+                F = 0.1 + 0.9 * self.rng.random() * (1 - ratio)
+                CR = 0.1 + 0.8 * self.rng.random()
 
                 # Select from superior, middle, and inferior groups
-                r_sup = np.random.choice(sup_idx)
-                r_inf = np.random.choice(inf_idx)
+                r_sup = self.rng.choice(sup_idx)
+                r_inf = self.rng.choice(inf_idx)
                 if len(mid_idx) > 0:
-                    r_mid = np.random.choice(mid_idx)
+                    r_mid = self.rng.choice(mid_idx)
                 else:
-                    r_mid = np.random.choice(sorted_idx)
+                    r_mid = self.rng.choice(sorted_idx)
 
                 # Guided mutation: bias toward superior solutions
                 mutant = X[i] + F * (X[r_sup] - X[r_inf]) + F * (X[r_sup] - X[r_mid])
@@ -44,9 +44,9 @@ class AGDE(_Base):
 
                 # Binomial crossover
                 trial = X[i].copy()
-                j_rand = np.random.randint(self.dim)
+                j_rand = self.rng.integers(self.dim)
                 for j in range(self.dim):
-                    if np.random.rand() < CR or j == j_rand:
+                    if self.rng.random() < CR or j == j_rand:
                         trial[j] = mutant[j]
 
                 trial_fit = self._eval(trial)

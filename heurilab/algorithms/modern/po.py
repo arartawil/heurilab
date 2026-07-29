@@ -24,28 +24,28 @@ class PO(_Base):
             for i in range(self.pop_size):
                 if i < n1:
                     # Foraging behavior (exploration)
-                    r1 = np.random.rand(self.dim)
-                    r2 = np.random.rand()
-                    j = np.random.randint(self.pop_size)
+                    r1 = self.rng.random(self.dim)
+                    r2 = self.rng.random()
+                    j = self.rng.integers(self.pop_size)
                     new_X = X[i] + alpha * r1 * (X[j] - X[i]) + r2 * (best - X[i])
 
                 elif i < n2:
                     # Staying behavior (exploitation near best)
-                    r = np.random.rand(self.dim)
+                    r = self.rng.random(self.dim)
                     Levy = self._levy_flight()
-                    new_X = best + alpha * Levy * (best - X[i]) + r * (1 - alpha) * np.random.randn(self.dim)
+                    new_X = best + alpha * Levy * (best - X[i]) + r * (1 - alpha) * self.rng.standard_normal(self.dim)
 
                 else:
                     # Communication behavior (social learning)
-                    j = np.random.randint(self.pop_size)
-                    k = np.random.randint(self.pop_size)
-                    r = np.random.rand(self.dim)
+                    j = self.rng.integers(self.pop_size)
+                    k = self.rng.integers(self.pop_size)
+                    r = self.rng.random(self.dim)
 
                     if fitness[j] < fitness[i]:
                         new_X = X[i] + r * (X[j] - X[k])
                     else:
                         # Flee with random displacement
-                        new_X = X[i] + alpha * np.random.randn(self.dim) * (self.ub - self.lb) * 0.01
+                        new_X = X[i] + alpha * self.rng.standard_normal(self.dim) * (self.ub - self.lb) * 0.01
 
                 new_X = self._clip(new_X)
                 new_fit = self._eval(new_X)
@@ -67,6 +67,6 @@ class PO(_Base):
         beta = 1.5
         sigma = (math.gamma(1 + beta) * np.sin(np.pi * beta / 2) /
                  (math.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
-        u = np.random.randn(self.dim) * sigma
-        v = np.random.randn(self.dim)
+        u = self.rng.standard_normal(self.dim) * sigma
+        v = self.rng.standard_normal(self.dim)
         return u / (np.abs(v) ** (1 / beta))

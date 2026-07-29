@@ -62,18 +62,48 @@ def friedman_test(all_data: Dict[str, Dict[str, List[float]]],
 
 def nemenyi_cd(n_algos: int, n_funcs: int, alpha: float = 0.05) -> float:
     """
-    Critical difference for Nemenyi post-hoc test.
-    CD = q_alpha * sqrt(n_algos * (n_algos + 1) / (6 * n_funcs))
+    Critical difference for the Nemenyi post-hoc test (Demsar, 2006).
+
+        CD = q_alpha * sqrt(k * (k + 1) / (6 * N))
+
+    where ``k`` is the number of algorithms, ``N`` the number of benchmark
+    functions, and ``q_alpha`` the Studentized range statistic at infinite
+    degrees of freedom divided by sqrt(2).
+
+    The tabulated values below cover the common case (alpha = 0.05,
+    k <= 20). Outside that range the statistic is computed exactly from
+    ``scipy.stats.studentized_range``; previously any k > 20 silently reused
+    the k = 5 value, which understates the critical difference and reports
+    differences as significant when they are not.
     """
-    q_values = {
+    if n_funcs <= 0:
+        raise ValueError("n_funcs must be positive")
+    if n_algos < 2:
+        # No pair exists, so no difference can be significant. Returning 0.0
+        # keeps single-algorithm reports working (nemenyi_pairwise then only
+        # compares an algorithm with itself, diff 0.0, which is not > 0.0).
+        return 0.0
+
+    q_values_005 = {
         2: 1.960, 3: 2.343, 4: 2.569, 5: 2.728, 6: 2.850,
         7: 2.949, 8: 3.031, 9: 3.102, 10: 3.164, 11: 3.219,
         12: 3.268, 13: 3.313, 14: 3.354, 15: 3.391, 16: 3.426,
         17: 3.458, 18: 3.489, 19: 3.517, 20: 3.544
     }
-    q = q_values.get(n_algos, 2.728)
-    cd = q * np.sqrt(n_algos * (n_algos + 1) / (6 * n_funcs))
-    return cd
+
+    q = None
+    if abs(alpha - 0.05) < 1e-12:
+        q = q_values_005.get(n_algos)
+    if q is None:
+        try:
+            from scipy.stats import studentized_range
+            q = float(studentized_range.ppf(1 - alpha, n_algos, np.inf) / np.sqrt(2))
+        except Exception:
+            # Last resort: hold the largest tabulated value rather than
+            # falling back to a smaller one (conservative, never anti-conservative).
+            q = q_values_005[max(q_values_005)]
+
+    return float(q * np.sqrt(n_algos * (n_algos + 1) / (6 * n_funcs)))
 
 
 def nemenyi_pairwise(mean_ranks: Dict[str, float], n_funcs: int,

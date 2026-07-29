@@ -20,30 +20,30 @@ class FO(_Base):
             p_explore = 1 - t / self.max_iter
 
             for i in range(self.pop_size):
-                r = np.random.rand()
+                r = self.rng.random()
 
                 if r < p_explore:
                     # Phase 1: Exploration — fox searching for prey
-                    if np.random.rand() < 0.5:
+                    if self.rng.random() < 0.5:
                         # Walking around territory
-                        j = np.random.randint(self.pop_size)
-                        r1 = np.random.rand(self.dim)
+                        j = self.rng.integers(self.pop_size)
+                        r1 = self.rng.random(self.dim)
                         new_X = X[i] + a * r1 * (X[j] - X[i])
                     else:
                         # Hearing-based exploration
                         dist = np.abs(best - X[i])
-                        angle = 2 * np.pi * np.random.rand(self.dim)
+                        angle = 2 * np.pi * self.rng.random(self.dim)
                         new_X = X[i] + dist * np.cos(angle) * a
                 else:
                     # Phase 2: Exploitation — fox stalking and pouncing
-                    if np.random.rand() < 0.5:
+                    if self.rng.random() < 0.5:
                         # Stalking: slowly approach prey (best)
-                        r1 = np.random.rand(self.dim)
-                        jump_strength = 2 * np.random.rand() * (1 - t / self.max_iter)
+                        r1 = self.rng.random(self.dim)
+                        jump_strength = 2 * self.rng.random() * (1 - t / self.max_iter)
                         new_X = best - jump_strength * r1 * (best - X[i])
                     else:
                         # Pouncing: leap toward prey
-                        tt = np.random.rand()
+                        tt = self.rng.random()
                         sp = best / (X[i] + 1e-16)
                         sp = np.clip(sp, -10, 10)
                         new_X = best * tt + (1 - tt) * sp * X[i] * (1 - t / self.max_iter)
