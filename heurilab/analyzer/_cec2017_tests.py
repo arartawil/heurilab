@@ -1,5 +1,17 @@
 """
-CEC 2017 benchmark dict for use with enhance(benchmarks=...).
+CEC2017-inspired benchmark dict for use with enhance(benchmarks=...).
+
+.. warning::
+
+   These are the functions from :mod:`heurilab.core.cec2017`, which is a
+   CEC2017-*inspired* suite: runtime-generated shift vectors, no rotation
+   matrices.  The Enhancement Advisor uses them as a fixed, well-behaved
+   diagnostic battery, and its scores are only ever compared against other
+   HeuriLab runs on the same battery - but the per-function numbers are not
+   official CEC 2017 results and must not be reported as such.
+
+   For official CEC 2017 use
+   :func:`heurilab.core.cec2017_fixed.get_cec2017_official_suite`.
 """
 
 from heurilab.core.cec2017 import (
@@ -12,7 +24,10 @@ from heurilab.core.cec2017 import (
 
 
 def cec2017_benchmarks(dim=30):
-    """Return a dict of all 29 CEC 2017 functions for enhance()."""
+    """Return a dict of all 29 CEC2017-inspired functions for enhance().
+
+    Not official CEC 2017 - see the module docstring.
+    """
     _ALL = [
         ("F1",  "F1 Bent Cigar (Unimodal)",         CEC17_F1,  100),
         ("F3",  "F3 Zakharov (Unimodal)",            CEC17_F3,  300),

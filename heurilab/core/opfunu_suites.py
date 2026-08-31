@@ -26,6 +26,7 @@ not support the requested ``ndim`` are skipped, and the skipped list is
 reported rather than silently dropped.
 """
 
+import warnings
 from typing import List, Optional, Sequence
 
 from heurilab.core.benchmarks import BenchmarkConfig, BenchmarkSuite
@@ -42,12 +43,27 @@ _INSTALL_HINT = (
 )
 
 
+
+def _warn_opfunu_incorrect(official, year, replacement):
+    """Warn that opfunu's implementation of a CEC edition is not the official one.
+
+    The data files opfunu ships are the organisers'; the functions computed
+    over them are not.  Verified against the reference C at 1000 points per
+    function by tests/test_cec_validity.py.
+    """
+    if official is False:
+        return
+    warnings.warn(
+        f"opfunu's CEC {year} functions do not match the organisers' reference "
+        f"code, so results from this suite are not comparable with published "
+        f"CEC {year} numbers. Use {replacement} instead, or pass "
+        f"official=False to silence this warning.",
+        UserWarning, stacklevel=3)
+
+
 def _require_opfunu():
-    try:
-        import opfunu  # noqa: F401
-    except ImportError as exc:  # pragma: no cover - exercised only without opfunu
-        raise ImportError(_INSTALL_HINT) from exc
-    return opfunu
+    from heurilab.core.cec_official import _import_opfunu
+    return _import_opfunu()
 
 
 class _OpfunuObjective:
@@ -223,8 +239,21 @@ def get_cec2014_opfunu_suite(ndim: int = 30, **kw) -> BenchmarkSuite:
     return get_opfunu_suite("2014", ndim, **kw)
 
 
-def get_cec2017_opfunu_suite(ndim: int = 30, **kw) -> BenchmarkSuite:
-    """CEC 2017 (29 functions: F1, F3-F30). Supported dimensions: 2, 10, 20, 30, 50, 100."""
+def get_cec2017_opfunu_suite(ndim: int = 30, official: bool = None,
+                             **kw) -> BenchmarkSuite:
+    """CEC 2017 through opfunu (29 functions: F1, F3-F30).
+
+    .. warning::
+
+       opfunu reads the organisers' data files but its *arithmetic* disagrees
+       with the reference C code on every function except F1 - see
+       :mod:`heurilab.core.cec2017_fixed`.  Use
+       :func:`heurilab.core.cec2017_fixed.get_cec2017_official_suite` for
+       official numbers.  Pass ``official=False`` to silence this warning.
+    """
+    _warn_opfunu_incorrect(official, "2017",
+                           "heurilab.core.cec2017_fixed."
+                           "get_cec2017_official_suite(ndim)")
     return get_opfunu_suite("2017", ndim, **kw)
 
 
@@ -238,6 +267,18 @@ def get_cec2021_opfunu_suite(ndim: int = 10, **kw) -> BenchmarkSuite:
     return get_opfunu_suite("2021", ndim, **kw)
 
 
-def get_cec2022_opfunu_suite(ndim: int = 10, **kw) -> BenchmarkSuite:
-    """CEC 2022 (12 functions). Supported dimensions: 2, 10, 20."""
+def get_cec2022_opfunu_suite(ndim: int = 10, official: bool = None,
+                             **kw) -> BenchmarkSuite:
+    """CEC 2022 through opfunu (12 functions). Supported dimensions: 2, 10, 20.
+
+    .. warning::
+
+       opfunu's CEC 2022 functions disagree with the organisers' reference C
+       code; the composition functions F9-F12 in particular index the shift
+       matrix with ``f_shift[0]`` for every sub-function.  Use
+       :func:`heurilab.core.cec2022_fixed.get_cec2022_suite` for official
+       numbers.  Pass ``official=False`` to silence this warning.
+    """
+    _warn_opfunu_incorrect(official, "2022",
+                           "heurilab.core.cec2022_fixed.get_cec2022_suite(ndim)")
     return get_opfunu_suite("2022", ndim, **kw)

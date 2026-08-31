@@ -123,8 +123,15 @@ Determined by installing each package and reading its source, not from its docum
 
 **Quick install:**
 ```bash
-pip install heurilab
+pip install heurilab                 # core: 98 algorithms, classical benchmarks
+pip install "heurilab[cec]"          # + official CEC 2017 / CEC 2022 suites
+pip install "heurilab[all]"          # + parallel runs (joblib)
 ```
+
+> The `cec` extra pins `setuptools<81` on purpose: `opfunu` (which carries the
+> organisers' CEC data files) still imports `pkg_resources`, and setuptools 81
+> removed it. On heurilab ≤ 2.3.0 you may need `pip install "setuptools<81"`
+> by hand.
 
 **From source (latest features):**
 ```bash
@@ -790,9 +797,53 @@ from heurilab import get_classical_suite, get_unimodal_suite, get_multimodal_sui
 
 ---
 
-### CEC 2017 Benchmark Functions (29 Functions)
+### Official CEC 2017 & CEC 2022 (verified against the organisers' C code)
 
-Based on the **CEC 2017** competition (Awad et al., 2016). F2 is excluded per official spec. All functions use **seeded shift vectors** — the global optimum is NOT at the origin. Search range: **[-100, 100]^D**.
+> **Use these for anything you intend to publish.** They are a faithful port of
+> the organisers' reference C — `cec17_test_func.cpp` and `cec22_test_func.cpp`
+> — evaluated over the official shift, rotation and shuffle data files.
+> `tests/test_cec_validity.py` checks every function at D = 10, 20, 30 and 50
+> against the compiled reference at 1000 identical points, plus `f(x*) == bias`
+> exactly, a bounded differential-evolution search, and 200,000 uniform samples
+> that must never dip below the bias.
+
+```python
+from heurilab import get_cec2017_official_suite, get_cec2022_suite
+
+suite_2017 = get_cec2017_official_suite(ndim=30)   # F1, F3–F30, official numbering
+suite_2022 = get_cec2022_suite(ndim=20)            # F1–F12, official numbering
+```
+
+Dimensions come from the official data, not from us: **CEC 2022 exists only at
+D = 2, 10 and 20**, and **CEC 2017 ships no D = 20 data** for F11–F19, F29 and
+F30 (the competition ran at 10, 30, 50 and 100). Suites report what they skip.
+
+Single functions and their optima:
+
+```python
+from heurilab import get_cec2022_function, get_cec2022_optimum
+
+f9 = get_cec2022_function(9, ndim=10)   # official CEC 2022 F9
+f9.evaluate(f9.x_global) == get_cec2022_optimum(9)   # -> True, exactly 2300.0
+```
+
+⚠️ **`get_cec2017_opfunu_suite()` / `get_cec2022_opfunu_suite()` are not
+official.** `opfunu` ships the organisers' data files but computes the
+functions differently; checked against the reference C it agrees with official
+CEC 2017 only on F1 and with official CEC 2022 only on F2. Both now warn and
+point here. See [CHANGELOG.md](CHANGELOG.md) for the full list of defects.
+
+### CEC2017-*inspired* Benchmark Functions (29 Functions)
+
+⚠️ **This is not official CEC 2017 — do not report results from it as CEC 2017.**
+Its shift vectors are generated at runtime and **no rotation matrices are
+applied**, which makes the suite substantially easier and flatters
+coordinate-wise algorithms. It is kept because earlier HeuriLab results were
+produced with it, and it remains a fine set of 29 shifted, biased, multimodal
+test problems. The suite constructors warn unless you pass `official=False`.
+For official numbers use `get_cec2017_official_suite(ndim)` above.
+
+F2 is excluded per official spec. All functions use **seeded shift vectors** — the global optimum is NOT at the origin. Search range: **[-100, 100]^D**.
 
 ```python
 from heurilab import CEC17_F1, CEC17_F3, ..., CEC17_F30

@@ -27,6 +27,18 @@ from heurilab.core.cec2017 import (
     get_cec2017_multimodal_suite, get_cec2017_hybrid_suite,
     get_cec2017_composition_suite,
 )
+from heurilab.core.cec_official import (
+    OfficialCEC, official_bias, supported_dimensions,
+    CEC2017_FUNCTION_NUMBERS, CEC2022_FUNCTION_NUMBERS,
+)
+from heurilab.core.cec2022_fixed import (
+    get_cec2022_suite, get_cec2022_function, get_cec2022_optimum,
+    cec2022_supported_dimensions,
+)
+from heurilab.core.cec2017_fixed import (
+    get_cec2017_official_suite, get_cec2017_official_function,
+    get_cec2017_official_optimum, cec2017_supported_dimensions,
+)
 from heurilab.core.cec2020 import (
     CEC20_F1, CEC20_F2, CEC20_F3, CEC20_F4, CEC20_F5,
     CEC20_F6, CEC20_F7, CEC20_F8, CEC20_F9, CEC20_F10,
@@ -51,8 +63,16 @@ from heurilab.engineering.problems import (
 from heurilab.analyzer import enhance
 from heurilab.analyzer import cec2017_benchmarks
 
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 __all__ = [
+    # Official CEC 2017 / CEC 2022 (verified against the organisers' C code)
+    "OfficialCEC", "official_bias", "supported_dimensions",
+    "CEC2017_FUNCTION_NUMBERS", "CEC2022_FUNCTION_NUMBERS",
+    "get_cec2022_suite", "get_cec2022_function", "get_cec2022_optimum",
+    "cec2022_supported_dimensions",
+    "get_cec2017_official_suite", "get_cec2017_official_function",
+    "get_cec2017_official_optimum", "cec2017_supported_dimensions",
+
     "run_experiment", "BenchmarkConfig", "BenchmarkSuite",
     # Classical F1–F23
     "F1", "F2", "F3", "F4", "F5", "F6", "F7",

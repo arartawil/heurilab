@@ -44,10 +44,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "build", "twine"]
-cec = ["opfunu>=1.0.0"]        # CEC 2005-2022 suites (heurilab.get_opfunu_suite)
+dev = ["pytest", "build", "twine", "pytest-xdist", "ziglang"]
+# pytest-xdist parallelises tests/test_cec_validity.py (`pytest -n auto`);
+# ziglang supplies the C++ compiler that builds the CEC organisers'
+# reference code that test checks against.
+cec = ["opfunu>=1.0.0", "setuptools<81"]   # CEC 2005-2022 data + suites
+# The setuptools pin is load-bearing, not cargo cult: opfunu 1.0.x does
+# `import pkg_resources` without declaring setuptools; Python >=3.12 venvs no
+# longer preinstall it; and setuptools >=81 dropped pkg_resources altogether.
+# Without the pin, `pip install heurilab[cec]` installs opfunu that cannot be
+# imported. Revisit when opfunu stops using pkg_resources.
 parallel = ["joblib"]           # run_experiment(n_jobs=...)
-all = ["opfunu>=1.0.0", "joblib"]
+all = ["opfunu>=1.0.0", "setuptools<81", "joblib"]
 
 [project.urls]
 Homepage = "https://github.com/arartawil/heurilab"

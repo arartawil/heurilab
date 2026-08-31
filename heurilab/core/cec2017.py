@@ -1,8 +1,46 @@
 """
-CEC 2017 Benchmark Functions (29 functions: F1, F3–F30)
-========================================================
-Based on the CEC 2017 competition on real-parameter single-objective
-optimization (Awad et al., 2016). F2 is excluded per the official spec.
+CEC2017-*inspired* Benchmark Functions (29 functions: F1, F3–F30)
+=================================================================
+
+.. warning::
+
+   **This is NOT the official CEC 2017 suite. Do not report results from it as
+   CEC 2017.**
+
+   The official benchmark is defined by the organisers' shift vectors and
+   rotation matrices, distributed as ``input_data/shift_data_*.txt`` and
+   ``input_data/M_*_D*.txt`` (Awad et al., 2016).  This module has neither:
+
+   * Its shift vectors are drawn at *runtime* from
+     ``numpy.random.RandomState(seed).uniform(-80, 80)``.  They are stable
+     across runs, but they are not the organisers' vectors, so the landscape's
+     optimum sits somewhere else entirely.
+   * **No rotation matrices are applied at all.**  Rotation is what makes the
+     CEC functions non-separable; without it, F1/F3/F4... are far easier and
+     coordinate-wise algorithms score much better than they should.
+   * The hybrid functions use no shuffle permutations, and the composition
+     functions use neither the official sub-function shifts nor their
+     rotations.
+
+   Numbers produced here are therefore **not comparable** with any published
+   CEC 2017 result or with any other library's CEC 2017 implementation.
+
+   For official CEC 2017 results use
+   :func:`heurilab.core.cec2017_fixed.get_cec2017_official_suite`, which is a
+   verified port of the organisers' reference C code over their own data
+   files::
+
+       from heurilab.core.cec2017_fixed import get_cec2017_official_suite
+       suite = get_cec2017_official_suite(ndim=30)
+
+   (:func:`heurilab.core.opfunu_suites.get_cec2017_opfunu_suite` reads the
+   official data files but computes several of the functions incorrectly; it is
+   not a substitute either.)
+
+   This module is kept because earlier HeuriLab results were produced with it
+   and removing it would silently invalidate them.  It remains a perfectly
+   usable set of 29 shifted, biased, multimodal test problems — just not
+   CEC 2017.
 
 Categories:
   Unimodal (2):           CEC17_F1, CEC17_F3
@@ -15,8 +53,26 @@ so the global optimum is NOT at the origin.
 Search range: [-100, 100]^D for all functions.
 """
 
+import warnings
+
 import numpy as np
 from heurilab.core.benchmarks import BenchmarkSuite
+
+_UNOFFICIAL_WARNING = (
+    "heurilab.core.cec2017 is a CEC2017-INSPIRED suite, not official CEC 2017: "
+    "its shift vectors are generated at runtime and no rotation matrices are "
+    "applied, so results are not comparable with published CEC 2017 numbers. "
+    "Use heurilab.core.cec2017_fixed.get_cec2017_official_suite(ndim) for "
+    "official results. Pass official=False to silence this warning if you "
+    "deliberately want the inspired suite."
+)
+
+
+def _warn_unofficial(official):
+    """Emit the not-official-CEC2017 warning unless the caller opted out."""
+    if official is False:
+        return
+    warnings.warn(_UNOFFICIAL_WARNING, UserWarning, stacklevel=3)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -478,40 +534,45 @@ CEC2017_FUNCTIONS = [
 #  Pre-built Suites
 # ═══════════════════════════════════════════════════════════════════════
 
-def get_cec2017_suite(category="CEC2017"):
+def get_cec2017_suite(category="CEC2017", official=None):
     """Return a BenchmarkSuite with all 29 CEC 2017 functions."""
+    _warn_unofficial(official)
     suite = BenchmarkSuite(category)
     for name, func, lb, ub, dim in CEC2017_FUNCTIONS:
         suite.add(name, func, lb, ub, dim)
     return suite
 
 
-def get_cec2017_unimodal_suite(category="CEC2017-Unimodal"):
+def get_cec2017_unimodal_suite(category="CEC2017-Unimodal", official=None):
     """Return CEC 2017 unimodal functions (F1, F3)."""
+    _warn_unofficial(official)
     suite = BenchmarkSuite(category)
     for name, func, lb, ub, dim in CEC2017_FUNCTIONS[:2]:
         suite.add(name, func, lb, ub, dim)
     return suite
 
 
-def get_cec2017_multimodal_suite(category="CEC2017-Multimodal"):
+def get_cec2017_multimodal_suite(category="CEC2017-Multimodal", official=None):
     """Return CEC 2017 simple multimodal functions (F4–F10)."""
+    _warn_unofficial(official)
     suite = BenchmarkSuite(category)
     for name, func, lb, ub, dim in CEC2017_FUNCTIONS[2:9]:
         suite.add(name, func, lb, ub, dim)
     return suite
 
 
-def get_cec2017_hybrid_suite(category="CEC2017-Hybrid"):
+def get_cec2017_hybrid_suite(category="CEC2017-Hybrid", official=None):
     """Return CEC 2017 hybrid functions (F11–F20)."""
+    _warn_unofficial(official)
     suite = BenchmarkSuite(category)
     for name, func, lb, ub, dim in CEC2017_FUNCTIONS[9:19]:
         suite.add(name, func, lb, ub, dim)
     return suite
 
 
-def get_cec2017_composition_suite(category="CEC2017-Composition"):
+def get_cec2017_composition_suite(category="CEC2017-Composition", official=None):
     """Return CEC 2017 composition functions (F21–F30)."""
+    _warn_unofficial(official)
     suite = BenchmarkSuite(category)
     for name, func, lb, ub, dim in CEC2017_FUNCTIONS[19:]:
         suite.add(name, func, lb, ub, dim)
